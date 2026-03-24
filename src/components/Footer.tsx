@@ -25,7 +25,7 @@ export const Footer = () => {
     <footer className="mt-20 border-t border-clay/60 bg-white/70">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-12 md:grid-cols-[1.2fr_1fr_1fr]">
         <div className="space-y-4">
-          <div className="font-display text-2xl text-ink">NPA-UK Enugu Community</div>
+          <div className="font-display text-2xl text-ink">NPA UK Community</div>
           <p className="text-sm text-charcoal/80">{t.footer.description}</p>
           <div className="rounded-2xl border border-clay/50 bg-sand px-4 py-3 text-xs uppercase tracking-[0.2em] text-forest">
             {content.announcement}
@@ -39,11 +39,6 @@ export const Footer = () => {
                 {link.key === 'admin' ? 'Admin' : t.nav[link.key as keyof typeof t.nav]}
               </Link>
             ))}
-            {!showAdmin ? (
-              <Link to="/login" className="link-underline w-fit">
-                Login
-              </Link>
-            ) : null}
           </div>
         </div>
         <div className="space-y-3 text-sm">

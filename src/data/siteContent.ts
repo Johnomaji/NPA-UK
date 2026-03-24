@@ -29,7 +29,7 @@ export type SiteContent = {
 };
 
 export const defaultContent: SiteContent = {
-  heroHeadline: 'NPA-UK Enugu Community',
+  heroHeadline: 'NPA UK Community',
   heroSubheadline:
     'A connected diaspora community honoring Igbo heritage, supporting families, and investing in Enugu.',
   mission:
@@ -49,7 +49,7 @@ export const defaultContent: SiteContent = {
     {
       title: 'Reconnecting the Igbo Diaspora',
       date: 'March 3, 2026',
-      detail: 'How NPA-UK is building bridges between Enugu and the UK.',
+      detail: 'How NPA UK is building bridges between Enugu and the UK.',
     },
     {
       title: 'Mentorship that Matters',

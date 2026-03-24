@@ -86,7 +86,7 @@ app.get('/api/session', (req, res) => {
 });
 
 app.post('/api/login', async (req, res) => {
-  const { username, password } = req.body ?? {};
+  const { username, password, remember } = req.body ?? {};
   if (!username || !password) {
     res.status(400).json({ error: 'Username and password required.' });
     return;
@@ -107,6 +107,7 @@ app.post('/api/login', async (req, res) => {
   }
 
   req.session.user = { id: user.id, username: user.username };
+  req.session.cookie.maxAge = remember ? 1000 * 60 * 60 * 24 * 7 : 1000 * 60 * 60 * 2;
   res.json({ authenticated: true, username: user.username });
 });
 

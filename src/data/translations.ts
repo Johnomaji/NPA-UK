@@ -133,8 +133,8 @@ type Translations = {
 const translations: Record<Language, Translations> = {
   en: {
     common: {
-      kicker: 'NPA-UK Enugu Community',
-      brandTagline: 'Enugu Community',
+      kicker: 'NPA UK Community',
+      brandTagline: 'NPA UK Community',
     },
     nav: {
       home: 'Home',
@@ -154,7 +154,7 @@ const translations: Record<Language, Translations> = {
       explore: 'Explore',
       contact: 'Contact',
       donate: 'Donate',
-      rightsPrefix: 'NPA-UK Enugu Community',
+      rightsPrefix: 'NPA UK Community',
     },
     home: {
       heroPrimaryCta: 'Explore Projects',
@@ -174,7 +174,7 @@ const translations: Record<Language, Translations> = {
     about: {
       title: 'About Us',
       subtitle:
-        'NPA-UK is a network of Ndi Enugu in the United Kingdom committed to service, heritage, and community prosperity.',
+        'NPA UK is a network of Ndi Enugu in the United Kingdom committed to service, heritage, and community prosperity.',
       purposeKicker: 'Purpose',
       purposeTitle: 'Our Mission & Vision',
       leadershipKicker: 'Leadership',
@@ -257,7 +257,7 @@ const translations: Record<Language, Translations> = {
     },
     blog: {
       title: 'Blog',
-      subtitle: 'Insights, stories, and perspectives from the NPA-UK Enugu community.',
+      subtitle: 'Insights, stories, and perspectives from the NPA UK community.',
       readMore: 'Read more',
     },
     gallery: {
@@ -286,7 +286,7 @@ const translations: Record<Language, Translations> = {
         'Support projects that improve lives across Enugu. Every contribution powers education, health, and infrastructure.',
       bankTitle: 'Bank Transfer',
       onlineTitle: 'Online Donation',
-      accountName: 'Account Name: NPA-UK Enugu Community',
+      accountName: 'Account Name: NPA UK Community',
       bank: 'Bank: Placeholder Bank',
       sortCode: 'Sort Code: 00-00-00',
       accountNumber: 'Account Number: 00000000',
@@ -311,8 +311,8 @@ const translations: Record<Language, Translations> = {
   },
   ig: {
     common: {
-      kicker: 'NPA-UK Enugu Community',
-      brandTagline: 'Ọgbakọ Enugu',
+      kicker: 'NPA UK Community',
+      brandTagline: 'NPA UK Community',
     },
     nav: {
       home: 'Ụlọ',
@@ -332,7 +332,7 @@ const translations: Record<Language, Translations> = {
       explore: 'Nyochaa',
       contact: 'Kpọtụrụ',
       donate: 'Nye Onyinye',
-      rightsPrefix: 'NPA-UK Enugu Community',
+      rightsPrefix: 'NPA UK Community',
     },
     home: {
       heroPrimaryCta: 'Lelee Ọrụ',
@@ -352,7 +352,7 @@ const translations: Record<Language, Translations> = {
     about: {
       title: 'Banyere Anyị',
       subtitle:
-        'NPA-UK bụ netwọk Ndi Enugu nọ na United Kingdom nwere ebumnuche ọrụ, omenala, na mmepe obodo.',
+        'NPA UK bụ netwọk Ndi Enugu nọ na United Kingdom nwere ebumnuche ọrụ, omenala, na mmepe obodo.',
       purposeKicker: 'Ebumnuche',
       purposeTitle: 'Ebumnuche & Okwu Anyị',
       leadershipKicker: 'Ndu',
@@ -435,7 +435,7 @@ const translations: Record<Language, Translations> = {
     },
     blog: {
       title: 'Blọgụ',
-      subtitle: 'Akụkọ, echiche, na echiche sitere na obodo NPA-UK Enugu.',
+      subtitle: 'Akụkọ, echiche, na echiche sitere na obodo NPA UK.',
       readMore: 'Gụọ ọzọ',
     },
     gallery: {
@@ -464,7 +464,7 @@ const translations: Record<Language, Translations> = {
         'Kwado ọrụ na-eme ka ndụ ndị mmadụ ka mma n’ime Enugu. Onyinye ọ bụla na-akwado agụmakwụkwọ, ahụ ike, na mmepe.',
       bankTitle: 'Nkwụ Ụgwọ Bank',
       onlineTitle: 'Nye Onyinye Online',
-      accountName: 'Aha Akaụntụ: NPA-UK Enugu Community',
+      accountName: 'Aha Akaụntụ: NPA UK Community',
       bank: 'Bank: Placeholder Bank',
       sortCode: 'Sort Code: 00-00-00',
       accountNumber: 'Nọmba Akaụntụ: 00000000',

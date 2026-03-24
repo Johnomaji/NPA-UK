@@ -3,7 +3,7 @@ import { useAuth } from './AuthProvider';
 import type { ReactNode } from 'react';
 
 export const ProtectedRoute = ({ children }: { children: ReactNode }) => {
-  const { status } = useAuth();
+  const { status, sessionExpired } = useAuth();
   const location = useLocation();
 
   if (status === 'loading') {
@@ -12,7 +12,8 @@ export const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 
   if (status !== 'authenticated') {
     const redirect = encodeURIComponent(location.pathname + location.search);
-    return <Navigate to={`/login?redirect=${redirect}`} replace />;
+    const reason = sessionExpired ? '&reason=expired' : '';
+    return <Navigate to={`/login?redirect=${redirect}${reason}`} replace />;
   }
 
   return children;
