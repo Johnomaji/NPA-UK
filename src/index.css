@@ -1,0 +1,77 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,600;6..96,700&family=Source+Sans+3:wght@300;400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --color-ink: 11 11 12;
+  --color-charcoal: 26 26 29;
+  --color-sand: 242 239 233;
+  --color-clay: 209 191 167;
+  --color-ember: 192 79 44;
+  --color-forest: 31 59 45;
+  --card-bg: 255 255 255;
+  --card-border: 209 191 167;
+  --selection: rgba(192, 79, 44, 0.25);
+  --hero-texture: radial-gradient(circle at 20% 20%, rgba(192, 79, 44, 0.15), transparent 50%),
+    radial-gradient(circle at 80% 10%, rgba(31, 59, 45, 0.2), transparent 45%),
+    linear-gradient(135deg, #f2efe9 0%, #e7ddcd 50%, #f7f3ee 100%);
+}
+
+[data-theme='coastal'] {
+  --color-ink: 10 17 20;
+  --color-charcoal: 27 42 49;
+  --color-sand: 237 244 247;
+  --color-clay: 199 215 225;
+  --color-ember: 47 111 126;
+  --color-forest: 31 77 87;
+  --card-bg: 255 255 255;
+  --card-border: 199 215 225;
+  --selection: rgba(47, 111, 126, 0.2);
+  --hero-texture: radial-gradient(circle at 18% 25%, rgba(47, 111, 126, 0.15), transparent 50%),
+    radial-gradient(circle at 85% 15%, rgba(31, 77, 87, 0.18), transparent 45%),
+    linear-gradient(135deg, #edf4f7 0%, #e1edf2 50%, #f6fbfd 100%);
+}
+
+[data-theme='sunset'] {
+  --color-ink: 28 16 11;
+  --color-charcoal: 43 28 22;
+  --color-sand: 248 239 228;
+  --color-clay: 226 199 161;
+  --color-ember: 208 90 59;
+  --color-forest: 91 58 46;
+  --card-bg: 255 252 248;
+  --card-border: 226 199 161;
+  --selection: rgba(208, 90, 59, 0.22);
+  --hero-texture: radial-gradient(circle at 20% 15%, rgba(208, 90, 59, 0.16), transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(91, 58, 46, 0.18), transparent 45%),
+    linear-gradient(135deg, #f8efe4 0%, #f2ddc2 50%, #fbf4ea 100%);
+}
+
+body {
+  @apply bg-sand text-charcoal font-body;
+}
+
+::selection {
+  background: var(--selection);
+}
+
+.section-title {
+  @apply font-display text-3xl md:text-4xl text-ink;
+}
+
+.section-kicker {
+  @apply text-xs uppercase tracking-[0.25em] text-forest font-semibold;
+}
+
+.card {
+  @apply rounded-2xl shadow-card;
+  background-color: rgb(var(--card-bg) / 0.9);
+  border: 1px solid rgb(var(--card-border) / 0.4);
+}
+
+.link-underline {
+  @apply relative after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-ember after:transition-transform hover:after:scale-x-100;
+}
