@@ -4,10 +4,14 @@ import { useSiteContentContext } from '../components/SiteContentProvider';
 import { defaultContent } from '../data/siteContent';
 import { themeOptions } from '../data/themes';
 import { getTranslations, languageOptions } from '../data/translations';
+import { supabase } from '../lib/supabase';
 
 export const Admin = () => {
   const { content, updateContent, resetContent } = useSiteContentContext();
   const t = getTranslations(content.language);
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
   const [form, setForm] = useState({
     heroHeadline: content.heroHeadline,
     heroSubheadline: content.heroSubheadline,
@@ -21,7 +25,7 @@ export const Admin = () => {
     announcement: content.announcement,
     theme: content.theme,
     language: content.language,
-    blogPosts: content.blogPosts.map((post) => ({ ...post })),
+    blogPosts: content.blogPosts.map((post) => ({ ...post, body: post.body ?? '' })),
     galleryItems: content.galleryItems.map((item) => ({ ...item })),
   });
 
@@ -32,7 +36,7 @@ export const Admin = () => {
     };
 
   const handleBlogChange =
-    (index: number, key: 'title' | 'date' | 'detail') =>
+    (index: number, key: 'title' | 'date' | 'detail' | 'body') =>
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setForm((prev) => ({
         ...prev,
@@ -42,7 +46,7 @@ export const Admin = () => {
       }));
     };
 
-  const handleGalleryChange =
+  const handleGalleryTitleChange =
     (index: number) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setForm((prev) => ({
@@ -53,10 +57,36 @@ export const Admin = () => {
       }));
     };
 
+  const handleGalleryImageUpload = async (index: number, file: File) => {
+    setUploadingIndex(index);
+    setUploadError(null);
+    try {
+      const ext = file.name.split('.').pop();
+      const filename = `gallery-${Date.now()}-${index}.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from('gallery')
+        .upload(filename, file, { upsert: true });
+      if (uploadErr) throw uploadErr;
+      const { data } = supabase.storage.from('gallery').getPublicUrl(filename);
+      setForm((prev) => ({
+        ...prev,
+        galleryItems: prev.galleryItems.map((item, idx) =>
+          idx === index ? { ...item, imageUrl: data.publicUrl } : item,
+        ),
+      }));
+    } catch (err) {
+      setUploadError(
+        err instanceof Error ? err.message : 'Upload failed. Check your Supabase storage bucket.',
+      );
+    } finally {
+      setUploadingIndex(null);
+    }
+  };
+
   const addBlogPost = () => {
     setForm((prev) => ({
       ...prev,
-      blogPosts: [...prev.blogPosts, { title: '', date: '', detail: '' }],
+      blogPosts: [...prev.blogPosts, { title: '', date: '', detail: '', body: '' }],
     }));
   };
 
@@ -96,7 +126,12 @@ export const Admin = () => {
       announcement: form.announcement,
       theme: form.theme,
       language: form.language,
-      blogPosts: form.blogPosts,
+      blogPosts: form.blogPosts.map(({ title, date, detail, body }) => ({
+        title,
+        date,
+        detail,
+        body: body || undefined,
+      })),
       galleryItems: form.galleryItems,
     });
   };
@@ -227,6 +262,7 @@ export const Admin = () => {
           />
         </div>
 
+        {/* Blog Posts */}
         <div className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <label className="text-xs uppercase tracking-[0.2em] text-forest">{t.admin.blogTitle}</label>
@@ -240,7 +276,7 @@ export const Admin = () => {
           </div>
           <div className="space-y-4">
             {form.blogPosts.map((post, index) => (
-              <div key={`${post.title}-${index}`} className="rounded-2xl border border-clay/40 bg-white/80 p-4 space-y-3">
+              <div key={index} className="rounded-2xl border border-clay/40 bg-white/80 p-4 space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-xs uppercase tracking-[0.2em] text-forest">Post {index + 1}</p>
                   <button
@@ -274,7 +310,19 @@ export const Admin = () => {
                   <textarea
                     value={post.detail}
                     onChange={handleBlogChange(index, 'detail')}
-                    rows={3}
+                    rows={2}
+                    className="mt-2 w-full rounded-xl border border-clay/60 bg-white px-4 py-3 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs uppercase tracking-[0.2em] text-forest">
+                    {t.admin.fullContent}
+                  </label>
+                  <textarea
+                    value={post.body}
+                    onChange={handleBlogChange(index, 'body')}
+                    rows={6}
+                    placeholder="Full post content. Separate paragraphs with a blank line."
                     className="mt-2 w-full rounded-xl border border-clay/60 bg-white px-4 py-3 text-sm"
                   />
                 </div>
@@ -283,6 +331,7 @@ export const Admin = () => {
           </div>
         </div>
 
+        {/* Gallery Items */}
         <div className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <label className="text-xs uppercase tracking-[0.2em] text-forest">{t.admin.galleryTitle}</label>
@@ -294,9 +343,12 @@ export const Admin = () => {
               {t.admin.addGallery}
             </button>
           </div>
+          {uploadError ? (
+            <p className="text-xs text-ember">{uploadError}</p>
+          ) : null}
           <div className="space-y-4">
             {form.galleryItems.map((item, index) => (
-              <div key={`${item.title}-${index}`} className="rounded-2xl border border-clay/40 bg-white/80 p-4 space-y-3">
+              <div key={index} className="rounded-2xl border border-clay/40 bg-white/80 p-4 space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-xs uppercase tracking-[0.2em] text-forest">Item {index + 1}</p>
                   <button
@@ -311,9 +363,37 @@ export const Admin = () => {
                   <label className="text-xs uppercase tracking-[0.2em] text-forest">Title</label>
                   <input
                     value={item.title}
-                    onChange={handleGalleryChange(index)}
+                    onChange={handleGalleryTitleChange(index)}
                     className="mt-2 w-full rounded-xl border border-clay/60 bg-white px-4 py-3 text-sm"
                   />
+                </div>
+                <div>
+                  <label className="text-xs uppercase tracking-[0.2em] text-forest">
+                    {t.admin.uploadImage}
+                  </label>
+                  <div className="mt-2 flex items-center gap-3">
+                    {item.imageUrl ? (
+                      <img
+                        src={item.imageUrl}
+                        alt={item.title}
+                        className="h-16 w-16 rounded-lg object-cover border border-clay/40"
+                      />
+                    ) : null}
+                    <label className="cursor-pointer rounded-full border border-clay/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-charcoal hover:bg-sand">
+                      {uploadingIndex === index ? t.admin.uploading : t.admin.uploadImage}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="sr-only"
+                        disabled={uploadingIndex !== null}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleGalleryImageUpload(index, file);
+                          e.target.value = '';
+                        }}
+                      />
+                    </label>
+                  </div>
                 </div>
               </div>
             ))}
@@ -330,6 +410,7 @@ export const Admin = () => {
           <button
             type="button"
             onClick={() => {
+              if (!confirm('Reset all content to defaults?')) return;
               resetContent();
               setForm({
                 heroHeadline: defaultContent.heroHeadline,
@@ -344,7 +425,7 @@ export const Admin = () => {
                 announcement: defaultContent.announcement,
                 theme: defaultContent.theme,
                 language: defaultContent.language,
-                blogPosts: defaultContent.blogPosts.map((post) => ({ ...post })),
+                blogPosts: defaultContent.blogPosts.map((post) => ({ ...post, body: post.body ?? '' })),
                 galleryItems: defaultContent.galleryItems.map((item) => ({ ...item })),
               });
             }}

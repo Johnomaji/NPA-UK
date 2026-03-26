@@ -1,138 +1,71 @@
 import express from 'express';
-import session from 'express-session';
 import cors from 'cors';
-import bcrypt from 'bcryptjs';
-import SQLiteStoreFactory from 'connect-sqlite3';
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8787;
-const SESSION_SECRET = process.env.SESSION_SECRET || 'dev-session-secret';
-const DB_DIR = path.join(__dirname, 'data');
-const DB_PATH = path.join(DB_DIR, 'app.db');
-const SESSION_DB_PATH = path.join(DB_DIR, 'sessions.db');
 
-fs.mkdirSync(DB_DIR, { recursive: true });
+if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
+  console.error('ERROR: SESSION_SECRET environment variable is required in production.');
+  process.exit(1);
+}
 
 const app = express();
 
+// Security headers
+app.use(helmet());
+
+// CORS — tighten origins in production via environment variable
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',')
+  : ['http://localhost:5173', 'http://127.0.0.1:5173'];
+
 app.use(
   cors({
-    origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+    origin: allowedOrigins,
     credentials: true,
   }),
 );
-app.use(express.json());
 
-const SQLiteStore = SQLiteStoreFactory(session);
-app.set('trust proxy', 1);
-app.use(
-  session({
-    store: new SQLiteStore({ db: path.basename(SESSION_DB_PATH), dir: DB_DIR }),
-    secret: SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: false,
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-    },
-  }),
-);
+app.use(express.json({ limit: '50kb' }));
 
-let db;
-
-async function initDb() {
-  db = await open({ filename: DB_PATH, driver: sqlite3.Database });
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL
-    );
-  `);
-
-  const existing = await db.get('SELECT id FROM users WHERE username = ?', ['nwanbueze']);
-  if (!existing) {
-    const passwordHash = await bcrypt.hash('admin', 10);
-    await db.run('INSERT INTO users (username, password_hash) VALUES (?, ?)', [
-      'nwanbueze',
-      passwordHash,
-    ]);
-  }
-}
-
-function requireAuth(req, res, next) {
-  if (req.session?.user?.id) {
-    next();
-    return;
-  }
-  res.status(401).json({ authenticated: false });
-}
-
-app.get('/api/session', (req, res) => {
-  if (req.session?.user?.id) {
-    res.json({ authenticated: true, username: req.session.user.username });
-    return;
-  }
-  res.json({ authenticated: false });
+// Rate limiting on all API routes
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-app.post('/api/login', async (req, res) => {
-  const { username, password, remember } = req.body ?? {};
-  if (!username || !password) {
-    res.status(400).json({ error: 'Username and password required.' });
-    return;
-  }
+app.use('/api/', apiLimiter);
 
-  const user = await db.get('SELECT id, username, password_hash FROM users WHERE username = ?', [
-    username,
-  ]);
-  if (!user) {
-    res.status(401).json({ error: 'Invalid credentials.' });
-    return;
-  }
-
-  const ok = await bcrypt.compare(password, user.password_hash);
-  if (!ok) {
-    res.status(401).json({ error: 'Invalid credentials.' });
-    return;
-  }
-
-  req.session.user = { id: user.id, username: user.username };
-  req.session.cookie.maxAge = remember ? 1000 * 60 * 60 * 24 * 7 : 1000 * 60 * 60 * 2;
-  res.json({ authenticated: true, username: user.username });
+// Health check
+app.get('/api/v1/health', (_req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-app.post('/api/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      res.status(500).json({ error: 'Failed to logout.' });
-      return;
-    }
-    res.clearCookie('connect.sid');
-    res.json({ ok: true });
+// Note: Authentication is handled by Supabase on the client side.
+// Add server-side protected routes here if needed — verify Supabase JWTs
+// via the Authorization header using @supabase/supabase-js on the server.
+
+// Centralised error handler
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err, _req, res, _next) => {
+  console.error(err);
+  res.status(500).json({ error: 'Internal server error.' });
+});
+
+const server = app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+
+// Graceful shutdown
+const shutdown = () => {
+  server.close(() => {
+    console.log('Server closed.');
+    process.exit(0);
   });
-});
+};
 
-app.get('/api/admin/verify', requireAuth, (req, res) => {
-  res.json({ ok: true });
-});
-
-initDb()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Auth server running on http://localhost:${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error('Failed to start server', err);
-    process.exit(1);
-  });
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);

@@ -70,14 +70,6 @@ export const Navbar = () => {
           >
             {t.nav.donate}
           </Link>
-          <a
-            href={content.donationLink}
-            className="hidden rounded-full border border-ember/50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-ember transition hover:bg-ember hover:text-white md:inline-flex"
-            target="_blank"
-            rel="noreferrer"
-          >
-            {t.nav.quickPay}
-          </a>
         </div>
       </div>
       {menuOpen ? (

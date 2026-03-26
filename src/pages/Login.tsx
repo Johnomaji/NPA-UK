@@ -10,9 +10,8 @@ export const Login = () => {
   const redirect = searchParams.get('redirect') || '/admin';
   const reason = searchParams.get('reason');
 
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -30,7 +29,7 @@ export const Login = () => {
     event.preventDefault();
     setSubmitting(true);
     setError(null);
-    const result = await login(username, password, rememberMe);
+    const result = await login(email, password, false);
     setSubmitting(false);
     if (result.ok) {
       navigate(redirect, { replace: true });
@@ -49,12 +48,14 @@ export const Login = () => {
           </div>
         ) : null}
         <div>
-          <label className="text-xs uppercase tracking-[0.2em] text-forest">Username</label>
+          <label className="text-xs uppercase tracking-[0.2em] text-forest">Email</label>
           <input
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
             className="mt-2 w-full rounded-xl border border-clay/60 bg-white px-4 py-3 text-sm"
-            autoComplete="username"
+            autoComplete="email"
+            required
           />
         </div>
         <div>
@@ -65,17 +66,9 @@ export const Login = () => {
             onChange={(event) => setPassword(event.target.value)}
             className="mt-2 w-full rounded-xl border border-clay/60 bg-white px-4 py-3 text-sm"
             autoComplete="current-password"
+            required
           />
         </div>
-        <label className="flex items-center gap-3 text-sm text-charcoal">
-          <input
-            type="checkbox"
-            checked={rememberMe}
-            onChange={(event) => setRememberMe(event.target.checked)}
-            className="h-4 w-4 rounded border-clay/60 text-forest focus:ring-forest"
-          />
-          Remember me (optional)
-        </label>
         {error ? <p className="text-sm text-ember">{error}</p> : null}
         <button
           type="submit"

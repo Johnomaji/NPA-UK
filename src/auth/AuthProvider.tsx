@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
+import { supabase } from '../lib/supabase';
 
 type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
 
@@ -8,7 +9,7 @@ type AuthState = {
   username: string | null;
   sessionExpired: boolean;
   login: (
-    username: string,
+    email: string,
     password: string,
     remember: boolean,
   ) => Promise<{ ok: true } | { ok: false; error: string }>;
@@ -21,70 +22,55 @@ const AuthContext = createContext<AuthState | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [status, setStatus] = useState<AuthStatus>('loading');
-  const [username, setUsername] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
   const wasAuthenticatedRef = useRef(false);
 
-  const refresh = useCallback(async () => {
-    try {
-      const res = await fetch('/api/session', { credentials: 'include' });
-      const data = await res.json();
-      if (data?.authenticated) {
+  useEffect(() => {
+    // Check initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
         setStatus('authenticated');
-        setUsername(data.username ?? null);
+        setEmail(session.user.email ?? null);
+        wasAuthenticatedRef.current = true;
+      } else {
+        setStatus('unauthenticated');
+      }
+    });
+
+    // Supabase handles token refresh automatically; we just listen for changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        setStatus('authenticated');
+        setEmail(session.user.email ?? null);
         setSessionExpired(false);
         wasAuthenticatedRef.current = true;
       } else {
-        if (wasAuthenticatedRef.current) {
+        if (wasAuthenticatedRef.current && event !== 'SIGNED_OUT') {
           setSessionExpired(true);
         }
+        if (event === 'SIGNED_OUT') {
+          wasAuthenticatedRef.current = false;
+        }
         setStatus('unauthenticated');
-        setUsername(null);
+        setEmail(null);
       }
-    } catch {
-      if (wasAuthenticatedRef.current) {
-        setSessionExpired(true);
-      }
-      setStatus('unauthenticated');
-      setUsername(null);
-    }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      refresh();
-    }, 1000 * 60 * 2);
-    const onFocus = () => {
-      refresh();
-    };
-    window.addEventListener('focus', onFocus);
-    return () => {
-      window.clearInterval(interval);
-      window.removeEventListener('focus', onFocus);
-    };
-  }, [refresh]);
-
-  const login = useCallback(async (user: string, pass: string, remember: boolean) => {
+  const login = useCallback(async (userEmail: string, password: string, _remember: boolean) => {
     try {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ username: user, password: pass, remember }),
+      const { error } = await supabase.auth.signInWithPassword({
+        email: userEmail,
+        password,
       });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        return { ok: false as const, error: data?.error ?? 'Login failed.' };
+      if (error) {
+        return { ok: false as const, error: error.message };
       }
-      const data = await res.json();
-      setStatus('authenticated');
-      setUsername(data.username ?? user);
-      setSessionExpired(false);
-      wasAuthenticatedRef.current = true;
       return { ok: true as const };
     } catch {
       return { ok: false as const, error: 'Login failed.' };
@@ -92,13 +78,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const logout = useCallback(async () => {
-    try {
-      await fetch('/api/logout', { method: 'POST', credentials: 'include' });
-    } finally {
+    await supabase.auth.signOut();
+  }, []);
+
+  const refresh = useCallback(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      setStatus('authenticated');
+      setEmail(session.user.email ?? null);
+    } else {
       setStatus('unauthenticated');
-      setUsername(null);
-      setSessionExpired(false);
-      wasAuthenticatedRef.current = false;
+      setEmail(null);
     }
   }, []);
 
@@ -107,8 +97,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const value = useMemo<AuthState>(
-    () => ({ status, username, sessionExpired, login, logout, refresh, clearSessionExpired }),
-    [status, username, sessionExpired, login, logout, refresh, clearSessionExpired],
+    () => ({ status, username: email, sessionExpired, login, logout, refresh, clearSessionExpired }),
+    [status, email, sessionExpired, login, logout, refresh, clearSessionExpired],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
