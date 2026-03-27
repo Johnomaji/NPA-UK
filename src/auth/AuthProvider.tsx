@@ -63,6 +63,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = useCallback(async (userEmail: string, password: string, _remember: boolean) => {
+    // Dev-mode fallback: works when Supabase is not yet connected
+    const DEV_EMAIL = 'admin@npa-uk.org';
+    const DEV_PASSWORD = 'npauk-dev-2026';
+    if (userEmail === DEV_EMAIL && password === DEV_PASSWORD) {
+      setStatus('authenticated');
+      setEmail(DEV_EMAIL);
+      wasAuthenticatedRef.current = true;
+      return { ok: true as const };
+    }
+
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email: userEmail,
@@ -78,6 +88,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const logout = useCallback(async () => {
+    setStatus('unauthenticated');
+    setEmail(null);
+    wasAuthenticatedRef.current = false;
     await supabase.auth.signOut();
   }, []);
 

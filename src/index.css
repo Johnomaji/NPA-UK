@@ -1,77 +1,119 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,600;6..96,700&family=Source+Sans+3:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Heritage (default dark theme) ─── */
 :root {
-  color-scheme: light;
-  --color-ink: 11 11 12;
-  --color-charcoal: 26 26 29;
-  --color-sand: 242 239 233;
-  --color-clay: 209 191 167;
-  --color-ember: 192 79 44;
-  --color-forest: 31 59 45;
-  --card-bg: 255 255 255;
-  --card-border: 209 191 167;
-  --selection: rgba(192, 79, 44, 0.25);
-  --hero-texture: radial-gradient(circle at 20% 20%, rgba(192, 79, 44, 0.15), transparent 50%),
-    radial-gradient(circle at 80% 10%, rgba(31, 59, 45, 0.2), transparent 45%),
-    linear-gradient(135deg, #f2efe9 0%, #e7ddcd 50%, #f7f3ee 100%);
+  color-scheme: dark;
+  --color-sand:     8  12  9;      /* main background */
+  --color-ink:    240 253 244;     /* primary text (near-white) */
+  --color-charcoal: 148 163 175;   /* secondary / muted text */
+  --color-clay:    31  41  36;     /* borders */
+  --color-ember:  250 204  21;     /* gold accent */
+  --color-forest:  74 222 128;     /* lime-green accent */
+  --card-bg:       13  22  16;
+  --card-border:   26  37  29;
+  --input-bg:      18  28  21;
+  --selection:     rgba(74, 222, 128, 0.22);
+  --hero-texture:
+    radial-gradient(ellipse at 12% 55%, rgba(74,222,128,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 88% 15%, rgba(250,204,21,0.06) 0%, transparent 50%),
+    linear-gradient(145deg, #080c09 0%, #0d1812 50%, #080c09 100%);
 }
 
+/* ─── Coastal dark ─── */
 [data-theme='coastal'] {
-  --color-ink: 10 17 20;
-  --color-charcoal: 27 42 49;
-  --color-sand: 237 244 247;
-  --color-clay: 199 215 225;
-  --color-ember: 47 111 126;
-  --color-forest: 31 77 87;
-  --card-bg: 255 255 255;
-  --card-border: 199 215 225;
-  --selection: rgba(47, 111, 126, 0.2);
-  --hero-texture: radial-gradient(circle at 18% 25%, rgba(47, 111, 126, 0.15), transparent 50%),
-    radial-gradient(circle at 85% 15%, rgba(31, 77, 87, 0.18), transparent 45%),
-    linear-gradient(135deg, #edf4f7 0%, #e1edf2 50%, #f6fbfd 100%);
+  color-scheme: dark;
+  --color-sand:     8  10  15;
+  --color-ink:    241 245 249;
+  --color-charcoal: 148 163 184;
+  --color-clay:    30  41  59;
+  --color-ember:   56 189 248;     /* sky-blue */
+  --color-forest:  94 234 212;     /* teal */
+  --card-bg:       12  15  23;
+  --card-border:   21  30  48;
+  --input-bg:      16  22  36;
+  --selection:     rgba(56,189,248,0.2);
+  --hero-texture:
+    radial-gradient(ellipse at 12% 55%, rgba(94,234,212,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 88% 15%, rgba(56,189,248,0.06) 0%, transparent 50%),
+    linear-gradient(145deg, #08090f 0%, #0c1020 50%, #08090f 100%);
 }
 
+/* ─── Sunset dark ─── */
 [data-theme='sunset'] {
-  --color-ink: 28 16 11;
-  --color-charcoal: 43 28 22;
-  --color-sand: 248 239 228;
-  --color-clay: 226 199 161;
-  --color-ember: 208 90 59;
-  --color-forest: 91 58 46;
-  --card-bg: 255 252 248;
-  --card-border: 226 199 161;
-  --selection: rgba(208, 90, 59, 0.22);
-  --hero-texture: radial-gradient(circle at 20% 15%, rgba(208, 90, 59, 0.16), transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(91, 58, 46, 0.18), transparent 45%),
-    linear-gradient(135deg, #f8efe4 0%, #f2ddc2 50%, #fbf4ea 100%);
+  color-scheme: dark;
+  --color-sand:    12   8   5;
+  --color-ink:    254 252 248;
+  --color-charcoal: 167 143 130;
+  --color-clay:    41  26  18;
+  --color-ember:  251 146  60;     /* orange */
+  --color-forest: 251 191  36;     /* amber */
+  --card-bg:       20  12   8;
+  --card-border:   41  26  18;
+  --input-bg:      28  17  11;
+  --selection:     rgba(251,146,60,0.2);
+  --hero-texture:
+    radial-gradient(ellipse at 12% 55%, rgba(251,191,36,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 88% 15%, rgba(251,146,60,0.06) 0%, transparent 50%),
+    linear-gradient(145deg, #0c0805 0%, #1a100a 50%, #0c0805 100%);
 }
 
+/* ─── Base ─── */
 body {
-  @apply bg-sand text-charcoal font-body;
+  @apply bg-sand text-ink font-body;
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
   background: var(--selection);
 }
 
+/* ─── Form inputs — dark override ─── */
+input:not([type='file']):not([type='checkbox']):not([type='radio']),
+textarea,
+select {
+  background-color: rgb(var(--input-bg)) !important;
+  color: rgb(var(--color-ink)) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgb(var(--color-charcoal) / 0.5) !important;
+}
+
+/* ─── Utility classes ─── */
 .section-title {
-  @apply font-display text-3xl md:text-4xl text-ink;
+  @apply font-display text-3xl font-bold text-ink md:text-4xl;
 }
 
 .section-kicker {
-  @apply text-xs uppercase tracking-[0.25em] text-forest font-semibold;
+  @apply text-xs font-semibold uppercase tracking-[0.28em] text-forest;
 }
 
 .card {
-  @apply rounded-2xl shadow-card;
-  background-color: rgb(var(--card-bg) / 0.9);
-  border: 1px solid rgb(var(--card-border) / 0.4);
+  @apply rounded-2xl transition-all duration-200;
+  background-color: rgb(var(--card-bg));
+  border: 1px solid rgb(var(--card-border));
+  box-shadow: 0 4px 32px -8px rgba(0, 0, 0, 0.5);
+}
+
+.card:hover {
+  border-color: rgb(var(--color-forest) / 0.25);
+}
+
+.badge {
+  @apply rounded-full border border-forest/30 bg-forest/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-forest;
 }
 
 .link-underline {
-  @apply relative after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-ember after:transition-transform hover:after:scale-x-100;
+  @apply relative after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-full
+    after:origin-left after:scale-x-0 after:bg-forest after:transition-transform hover:after:scale-x-100;
+}
+
+/* number accent used in feature cards */
+.num-accent {
+  @apply font-display text-5xl font-bold leading-none text-forest;
 }

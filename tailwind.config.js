@@ -1,4 +1,4 @@
-﻿/** @type {import('tailwindcss').Config} */
+/** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
@@ -12,11 +12,12 @@ export default {
         forest: 'rgb(var(--color-forest) / <alpha-value>)',
       },
       fontFamily: {
-        display: ['"Bodoni Moda"', 'serif'],
-        body: ['"Source Sans 3"', 'system-ui', 'sans-serif'],
+        display: ['"Space Grotesk"', 'sans-serif'],
+        body: ['Inter', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        card: '0 20px 50px -30px rgba(0,0,0,0.35)',
+        card: '0 4px 32px -8px rgba(0,0,0,0.5)',
+        glow: '0 0 32px -8px rgba(74,222,128,0.3)',
       },
       backgroundImage: {
         'hero-texture': 'var(--hero-texture)',

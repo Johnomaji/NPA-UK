@@ -22,68 +22,85 @@ export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 bg-sand/80 border-b border-clay/60 backdrop-blur">
+    <header
+      className="sticky top-0 z-40 backdrop-blur-md"
+      style={{
+        background: 'rgb(var(--color-sand) / 0.88)',
+        borderBottom: '1px solid rgb(var(--card-border))',
+      }}
+    >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link to="/" className="flex items-baseline gap-3">
-          <span className="font-display text-2xl text-ink">NPA UK</span>
-          <span className="text-xs uppercase tracking-[0.28em] text-forest">
-            {t.common.brandTagline}
+        {/* Logo */}
+        <Link to="/" className="group flex items-center gap-2">
+          <span className="font-display text-2xl font-bold text-ink transition-colors group-hover:text-forest">
+            NPA UK
+          </span>
+          <span
+            className="hidden rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-sand sm:inline-block"
+            style={{ background: 'rgb(var(--color-forest))' }}
+          >
+            Community
           </span>
         </Link>
-        <nav className="hidden items-center gap-6 text-sm font-semibold text-charcoal lg:flex">
+
+        {/* Desktop nav */}
+        <nav className="hidden items-center gap-6 text-sm font-medium text-charcoal lg:flex">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `transition-colors ${
-                  isActive ? 'text-ember' : 'text-charcoal hover:text-ember'
-                }`
+                `transition-colors ${isActive ? 'text-forest' : 'text-charcoal hover:text-ink'}`
               }
             >
               {t.nav[item.key as keyof typeof t.nav]}
             </NavLink>
           ))}
         </nav>
+
+        {/* Actions */}
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => setMenuOpen((open) => !open)}
-            className="rounded-full border border-clay/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-charcoal transition hover:bg-clay/40 lg:hidden"
+            onClick={() => setMenuOpen((o) => !o)}
             aria-expanded={menuOpen}
             aria-label="Toggle navigation"
+            className="rounded-full border border-clay/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-charcoal transition hover:border-forest/40 hover:text-forest lg:hidden"
           >
             {menuOpen ? 'Close' : 'Menu'}
           </button>
+
           {status === 'authenticated' ? (
             <button
               type="button"
               onClick={logout}
-              className="hidden rounded-full border border-clay/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-charcoal transition hover:bg-clay/40 md:inline-flex"
+              className="hidden rounded-full border border-clay/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-charcoal transition hover:border-forest/40 hover:text-forest md:inline-flex"
             >
               Logout
             </button>
           ) : null}
+
           <Link
             to="/donate"
-            className="rounded-full border border-ember/60 bg-ember px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow"
+            className="rounded-full px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] text-sand transition hover:brightness-110"
+            style={{ background: 'rgb(var(--color-forest))' }}
           >
             {t.nav.donate}
           </Link>
         </div>
       </div>
+
+      {/* Mobile menu */}
       {menuOpen ? (
-        <div className="border-t border-clay/60 bg-sand/95 backdrop-blur lg:hidden">
-          <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-6 text-sm font-semibold text-charcoal">
+        <div style={{ borderTop: '1px solid rgb(var(--card-border))', background: 'rgb(var(--color-sand) / 0.97)' }}>
+          <div className="mx-auto flex max-w-6xl flex-col gap-5 px-6 py-6 text-sm font-medium text-charcoal">
             {navItems.map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  `transition-colors ${
-                    isActive ? 'text-ember' : 'text-charcoal hover:text-ember'
-                  }`
+                  `transition-colors ${isActive ? 'text-forest' : 'text-charcoal hover:text-forest'}`
                 }
               >
                 {t.nav[item.key as keyof typeof t.nav]}
@@ -92,17 +109,12 @@ export const Navbar = () => {
             {status === 'authenticated' ? (
               <button
                 type="button"
-                onClick={() => {
-                  logout();
-                  setMenuOpen(false);
-                }}
-                className="text-left text-charcoal hover:text-ember"
+                onClick={() => { logout(); setMenuOpen(false); }}
+                className="text-left text-charcoal hover:text-forest"
               >
                 Logout
               </button>
-            ) : (
-              null
-            )}
+            ) : null}
           </div>
         </div>
       ) : null}

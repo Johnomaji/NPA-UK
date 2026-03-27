@@ -13,9 +13,9 @@ export const SiteLayout = () => {
   }, [content.language, content.theme]);
 
   return (
-    <div className="min-h-screen bg-sand">
+    <div className="min-h-screen">
       <Navbar />
-      <main className="mx-auto max-w-6xl px-6 py-12">
+      <main className="mx-auto max-w-6xl px-6 py-14">
         <Outlet />
       </main>
       <Footer />
