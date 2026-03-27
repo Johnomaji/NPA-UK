@@ -99,16 +99,17 @@ export const Gallery = () => {
                       : 'rgb(var(--card-border)/0.5)',
                   }}
                 >
-                  <CameraIcon
-                    className="h-7 w-7"
+                  <span
                     style={{
                       color: i % 3 === 0
                         ? 'rgb(var(--color-forest)/0.4)'
                         : i % 3 === 1
                         ? 'rgb(var(--color-ember)/0.4)'
                         : 'rgb(var(--color-charcoal)/0.2)',
-                    } as React.CSSProperties}
-                  />
+                    }}
+                  >
+                    <CameraIcon className="h-7 w-7" />
+                  </span>
                 </div>
                 <div className="p-3">
                   <p className="truncate text-xs font-semibold text-charcoal/60 group-hover:text-ink transition-colors">

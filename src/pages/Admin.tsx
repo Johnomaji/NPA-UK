@@ -4,7 +4,7 @@ import { useSiteContentContext } from '../components/SiteContentProvider';
 import { useAuth } from '../auth/AuthProvider';
 import { defaultContent } from '../data/siteContent';
 import { themeOptions } from '../data/themes';
-import { getTranslations, languageOptions } from '../data/translations';
+import { languageOptions } from '../data/translations';
 import { supabase } from '../lib/supabase';
 import {
   CameraIcon,
@@ -60,7 +60,6 @@ type TabId = 'general' | 'blog' | 'gallery';
 export const Admin = () => {
   const { content, updateContent, resetContent } = useSiteContentContext();
   const { username, logout } = useAuth();
-  const t = getTranslations(content.language);
 
   const [activeTab, setActiveTab] = useState<TabId>('general');
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
