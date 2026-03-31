@@ -11,6 +11,7 @@ import { Blog } from './pages/Blog';
 import { Contact } from './pages/Contact';
 import { Donate } from './pages/Donate';
 import { Admin } from './pages/Admin';
+import { MemberDetail } from './pages/MemberDetail';
 import { NotFound } from './pages/NotFound';
 import { AuthProvider } from './auth/AuthProvider';
 import { ProtectedRoute } from './auth/ProtectedRoute';
@@ -32,6 +33,7 @@ function App() {
               <Route path="/blog" element={<Blog />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/donate" element={<Donate />} />
+              <Route path="/members/:id" element={<MemberDetail />} />
               <Route path="/login" element={<Login />} />
               <Route
                 path="/admin"

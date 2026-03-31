@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useSiteContentContext } from '../components/SiteContentProvider';
 import { getTranslations } from '../data/translations';
 
@@ -144,6 +145,55 @@ export const About = () => {
                 <p className="text-sm leading-relaxed text-charcoal/60">{leader.detail}</p>
               </div>
             </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Community Members ── */}
+      <section className="space-y-8">
+        <div className="space-y-3">
+          <p className="section-kicker">Our People</p>
+          <h2 className="section-title">Community Members</h2>
+        </div>
+        <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+          {content.members.map((member) => (
+            <Link
+              key={member.id}
+              to={`/members/${member.id}`}
+              className="card group flex flex-col overflow-hidden p-0 transition-transform hover:-translate-y-1"
+            >
+              {/* Photo */}
+              {member.imageUrl ? (
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src={member.imageUrl}
+                    alt={member.name}
+                    className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+              ) : (
+                <div
+                  className="flex h-48 items-center justify-center"
+                  style={{ background: 'rgb(var(--color-forest)/0.08)' }}
+                >
+                  <span
+                    className="font-display text-4xl font-bold"
+                    style={{ color: 'rgb(var(--color-forest)/0.3)' }}
+                  >
+                    {member.name.charAt(0)}
+                  </span>
+                </div>
+              )}
+              {/* Info */}
+              <div className="space-y-1 p-5">
+                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-forest">
+                  {member.title}
+                </p>
+                <p className="text-sm font-bold text-ink transition-colors group-hover:text-forest">
+                  {member.name}
+                </p>
+              </div>
+            </Link>
           ))}
         </div>
       </section>

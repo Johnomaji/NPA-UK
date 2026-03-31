@@ -16,6 +16,7 @@ import {
   EyeIcon,
   ImageIcon,
   SettingsIcon,
+  UsersIcon,
 } from '../components/Icons';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -53,7 +54,7 @@ const Card = ({ title, children }: CardProps) => (
   </div>
 );
 
-type TabId = 'general' | 'blog' | 'gallery';
+type TabId = 'general' | 'blog' | 'gallery' | 'members';
 
 // ── Component ──────────────────────────────────────────────────────────────
 
@@ -66,6 +67,9 @@ export const Admin = () => {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [expandedPosts, setExpandedPosts] = useState<Set<number>>(new Set([0]));
+  const [memberUploadingIndex, setMemberUploadingIndex] = useState<number | null>(null);
+  const [memberUploadError, setMemberUploadError] = useState<string | null>(null);
+  const [expandedMembers, setExpandedMembers] = useState<Set<number>>(new Set([0]));
 
   const [form, setForm] = useState({
     heroHeadline: content.heroHeadline,
@@ -82,6 +86,7 @@ export const Admin = () => {
     language: content.language,
     blogPosts: content.blogPosts.map((p) => ({ ...p, body: p.body ?? '', imageUrl: p.imageUrl ?? '' })),
     galleryItems: content.galleryItems.map((i) => ({ ...i })),
+    members: content.members.map((m) => ({ ...m, imageUrl: m.imageUrl ?? '' })),
   });
 
   // Auto-dismiss saved toast after 3 s
@@ -177,6 +182,72 @@ export const Admin = () => {
       galleryItems: prev.galleryItems.filter((_, i) => i !== index),
     }));
 
+  const handleMemberChange =
+    (index: number, key: 'name' | 'title' | 'bio' | 'imageUrl') =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setForm((prev) => ({
+        ...prev,
+        members: prev.members.map((m, i) => (i === index ? { ...m, [key]: e.target.value } : m)),
+      }));
+
+  const handleMemberImageUpload = async (index: number, file: File) => {
+    setMemberUploadingIndex(index);
+    setMemberUploadError(null);
+    try {
+      const ext = file.name.split('.').pop();
+      const filename = `member-${Date.now()}-${index}.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from('members')
+        .upload(filename, file, { upsert: true });
+      if (uploadErr) throw uploadErr;
+      const { data } = supabase.storage.from('members').getPublicUrl(filename);
+      setForm((prev) => ({
+        ...prev,
+        members: prev.members.map((m, i) =>
+          i === index ? { ...m, imageUrl: data.publicUrl } : m,
+        ),
+      }));
+    } catch (err) {
+      setMemberUploadError(
+        err instanceof Error ? err.message : 'Upload failed. Check your Supabase storage bucket.',
+      );
+    } finally {
+      setMemberUploadingIndex(null);
+    }
+  };
+
+  const addMember = () => {
+    const id = `member-${Date.now()}`;
+    const next = form.members.length;
+    setForm((prev) => ({
+      ...prev,
+      members: [...prev.members, { id, name: '', title: '', bio: '', imageUrl: '' }],
+    }));
+    setExpandedMembers((prev) => new Set([...prev, next]));
+  };
+
+  const removeMember = (index: number) => {
+    setForm((prev) => ({
+      ...prev,
+      members: prev.members.filter((_, i) => i !== index),
+    }));
+    setExpandedMembers((prev) => {
+      const next = new Set<number>();
+      prev.forEach((n) => {
+        if (n < index) next.add(n);
+        else if (n > index) next.add(n - 1);
+      });
+      return next;
+    });
+  };
+
+  const toggleMember = (index: number) =>
+    setExpandedMembers((prev) => {
+      const next = new Set(prev);
+      next.has(index) ? next.delete(index) : next.add(index);
+      return next;
+    });
+
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
@@ -201,6 +272,13 @@ export const Admin = () => {
           imageUrl: imageUrl || undefined,
         })),
         galleryItems: form.galleryItems,
+        members: form.members.map(({ id, name, title, bio, imageUrl }) => ({
+          id,
+          name,
+          title,
+          bio,
+          imageUrl: imageUrl || undefined,
+        })),
       });
       setSavedAt(Date.now());
     },
@@ -225,6 +303,7 @@ export const Admin = () => {
       language: defaultContent.language,
       blogPosts: defaultContent.blogPosts.map((p) => ({ ...p, body: p.body ?? '', imageUrl: p.imageUrl ?? '' })),
       galleryItems: defaultContent.galleryItems.map((i) => ({ ...i })),
+      members: defaultContent.members.map((m) => ({ ...m, imageUrl: m.imageUrl ?? '' })),
     });
     setSavedAt(Date.now());
   };
@@ -233,6 +312,7 @@ export const Admin = () => {
     { id: 'general', label: 'General', icon: <SettingsIcon className="h-3.5 w-3.5" /> },
     { id: 'blog', label: 'Blog Posts', icon: <ImageIcon className="h-3.5 w-3.5" />, count: form.blogPosts.length },
     { id: 'gallery', label: 'Gallery', icon: <CameraIcon className="h-3.5 w-3.5" />, count: form.galleryItems.length },
+    { id: 'members', label: 'Members', icon: <UsersIcon className="h-3.5 w-3.5" />, count: form.members.length },
   ];
 
   return (
@@ -607,6 +687,190 @@ export const Admin = () => {
                 <PlusIcon className="h-6 w-6 text-charcoal/20" />
                 <p className="text-xs text-charcoal/30">Add item</p>
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* ════ MEMBERS TAB ════ */}
+        {activeTab === 'members' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-forest">Community Members</p>
+                <p className="mt-0.5 text-xs text-charcoal/50">{form.members.length} members · shown on the About page</p>
+              </div>
+              <button
+                type="button"
+                onClick={addMember}
+                className="flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-sand transition hover:brightness-110"
+                style={{ background: 'rgb(var(--color-forest))' }}
+              >
+                <PlusIcon className="h-3 w-3" /> Add Member
+              </button>
+            </div>
+
+            {memberUploadError && (
+              <div
+                className="rounded-xl px-4 py-3 text-sm text-ember"
+                style={{ background: 'rgb(var(--color-ember)/0.1)', border: '1px solid rgb(var(--color-ember)/0.25)' }}
+              >
+                {memberUploadError}
+              </div>
+            )}
+
+            {form.members.length === 0 && (
+              <div
+                className="flex flex-col items-center justify-center rounded-2xl py-16 text-center"
+                style={{ border: '1px dashed rgb(var(--card-border))' }}
+              >
+                <UsersIcon className="mb-3 h-8 w-8 text-charcoal/20" />
+                <p className="text-sm text-charcoal/40">No members yet. Add your first one.</p>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              {form.members.map((member, index) => {
+                const isOpen = expandedMembers.has(index);
+                return (
+                  <div
+                    key={member.id}
+                    className="overflow-hidden rounded-2xl"
+                    style={{ border: '1px solid rgb(var(--card-border))', background: 'rgb(var(--card-bg))' }}
+                  >
+                    {/* Accordion header */}
+                    <button
+                      type="button"
+                      onClick={() => toggleMember(index)}
+                      className="flex w-full items-center gap-3 px-5 py-4 text-left transition hover:bg-forest/5"
+                    >
+                      {/* Photo thumbnail or initial */}
+                      {member.imageUrl ? (
+                        <img
+                          src={member.imageUrl}
+                          alt=""
+                          className="h-8 w-8 flex-none rounded-lg object-cover object-top"
+                          style={{ border: '1px solid rgb(var(--card-border))' }}
+                        />
+                      ) : (
+                        <span
+                          className="flex h-8 w-8 flex-none items-center justify-center rounded-lg text-xs font-bold"
+                          style={{ background: 'rgb(var(--color-forest)/0.1)', color: 'rgb(var(--color-forest))' }}
+                        >
+                          {member.name ? member.name.charAt(0).toUpperCase() : index + 1}
+                        </span>
+                      )}
+                      <span className="flex-1 truncate text-sm font-semibold text-ink">
+                        {member.name || <span className="italic text-charcoal/30">Unnamed member</span>}
+                      </span>
+                      {member.title && (
+                        <span className="hidden text-xs text-charcoal/40 sm:block">{member.title}</span>
+                      )}
+                      <ChevronDownIcon
+                        className={`h-4 w-4 flex-none text-charcoal/40 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+
+                    {/* Accordion body */}
+                    {isOpen && (
+                      <div className="space-y-4 border-t px-5 py-5" style={{ borderColor: 'rgb(var(--card-border))' }}>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          <Field label="Full Name">
+                            <input
+                              value={member.name}
+                              onChange={handleMemberChange(index, 'name')}
+                              className={inputCls}
+                              style={inputStyle}
+                              placeholder="e.g. Chukwuemeka Obi"
+                            />
+                          </Field>
+                          <Field label="Title / Role">
+                            <input
+                              value={member.title}
+                              onChange={handleMemberChange(index, 'title')}
+                              className={inputCls}
+                              style={inputStyle}
+                              placeholder="e.g. Community Secretary"
+                            />
+                          </Field>
+                        </div>
+
+                        <Field label="Bio" hint="Separate paragraphs with a blank line">
+                          <textarea
+                            value={member.bio}
+                            onChange={handleMemberChange(index, 'bio')}
+                            rows={6}
+                            className={inputCls}
+                            style={inputStyle}
+                            placeholder="Write the member's biography here…"
+                          />
+                        </Field>
+
+                        <Field label="Photo" hint="Paste a direct image URL, or upload to Supabase storage">
+                          <div className="flex gap-3">
+                            <input
+                              value={member.imageUrl}
+                              onChange={handleMemberChange(index, 'imageUrl')}
+                              className={inputCls}
+                              style={inputStyle}
+                              placeholder="/com1.jpeg or https://…"
+                            />
+                            {member.imageUrl && (
+                              <img
+                                src={member.imageUrl}
+                                alt=""
+                                className="mt-2 h-10 w-10 flex-none rounded-lg object-cover object-top"
+                                style={{ border: '1px solid rgb(var(--card-border))' }}
+                              />
+                            )}
+                          </div>
+                          <label
+                            className={`mt-2 inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.15em] transition ${
+                              memberUploadingIndex === index
+                                ? 'cursor-not-allowed text-charcoal/30'
+                                : 'text-forest hover:bg-forest/10'
+                            }`}
+                            style={{
+                              borderColor:
+                                memberUploadingIndex === index
+                                  ? 'rgb(var(--card-border))'
+                                  : 'rgb(var(--color-forest)/0.35)',
+                            }}
+                          >
+                            <CameraIcon className="h-3 w-3" />
+                            {memberUploadingIndex === index
+                              ? 'Uploading…'
+                              : member.imageUrl
+                              ? 'Replace Photo'
+                              : 'Upload Photo'}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="sr-only"
+                              disabled={memberUploadingIndex !== null}
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleMemberImageUpload(index, file);
+                                e.target.value = '';
+                              }}
+                            />
+                          </label>
+                        </Field>
+
+                        <div className="flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => removeMember(index)}
+                            className="flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold text-ember transition hover:bg-ember/10"
+                            style={{ borderColor: 'rgb(var(--color-ember)/0.35)' }}
+                          >
+                            <TrashIcon className="h-3 w-3" /> Remove Member
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

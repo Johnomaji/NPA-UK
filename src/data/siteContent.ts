@@ -14,6 +14,14 @@ export type GalleryItem = {
   imageUrl?: string;
 };
 
+export type CommunityMember = {
+  id: string;
+  name: string;
+  title: string;
+  bio: string;
+  imageUrl?: string;
+};
+
 export type SiteContent = {
   heroHeadline: string;
   heroSubheadline: string;
@@ -29,6 +37,7 @@ export type SiteContent = {
   language: Language;
   blogPosts: BlogPost[];
   galleryItems: GalleryItem[];
+  members: CommunityMember[];
 };
 
 const UNS = 'https://images.unsplash.com/photo-';
@@ -108,6 +117,44 @@ export const defaultContent: SiteContent = {
       detail: 'What to expect from the Nenwe Progressive Association UK this year.',
       imageUrl: `${UNS}1517048676732-d65bc937f952${Q}`,
       body: 'The Nenwe Progressive Association UK enters 2026 with its most ambitious roadmap yet. Here is a preview of what we have planned.\n\nIn the first quarter, we will launch the open call for community development fund proposals — any Nenwe community group can apply for project support. In the second quarter, our annual Cultural Showcase returns to London, bigger than ever.\n\nThe third quarter will see the expansion of our STEM Mentorship programme to reach students in three additional secondary schools. And in the final quarter, we will hold our biggest fundraising dinner yet, with all proceeds going directly to Nenwe projects.\n\nWe are also exploring partnerships with other Nigerian diaspora organisations in the UK to amplify our collective impact. More on that soon.\n\nStay connected, stay involved, and as always — Nenwe first.',
+    },
+  ],
+
+  members: [
+    {
+      id: '1',
+      name: 'Chukwuemeka Obi',
+      title: 'Community Secretary',
+      bio: 'Chukwuemeka Obi has served as Community Secretary for the Nenwe Progressive Association UK since 2022. Born in Nenwe, Enugu State, he moved to the United Kingdom in 2010 and has been a driving force in diaspora engagement ever since.\n\nWith a background in public administration, Chukwuemeka manages the association\'s records, correspondence, and membership affairs with meticulous care. He is passionate about transparency and accountability within community organisations.\n\nOutside of his role in the association, he mentors young Igbo professionals navigating UK career pathways and serves as a school governor in his local authority.',
+      imageUrl: '/com1.jpg',
+    },
+    {
+      id: '2',
+      name: 'Adaora Nwosu',
+      title: 'Youth Coordinator',
+      bio: 'Adaora Nwosu brings energy, creativity, and a deep love for Nenwe culture to her role as Youth Coordinator. She leads all youth-facing programmes for the NPA UK, including the STEM Mentorship initiative and the Cultural Exchange Summer School.\n\nAdaora grew up between Nenwe and London, giving her a unique perspective on the challenges and opportunities facing second-generation diaspora youth. She holds a degree in Education Studies and works as a secondary school teacher.\n\nHer vision is a generation of young Ndi Nenwe who are proud of their heritage, equipped for the modern world, and connected to their community on both sides of the Atlantic.',
+      imageUrl: '/com2.jpg',
+    },
+    {
+      id: '3',
+      name: 'Ifeanyi Eze',
+      title: 'Cultural Director',
+      bio: 'Ifeanyi Eze is the keeper of culture within the NPA UK. As Cultural Director, he oversees the association\'s annual Cultural Showcase, traditional festivals, and heritage preservation efforts — including an ongoing oral history project documenting the stories of Nenwe elders.\n\nA trained historian and storyteller, Ifeanyi has spent over a decade researching Igbo oral traditions, folklore, and the social history of Nenwe. He regularly lectures at UK universities on diaspora identity and cultural continuity.\n\nIfeanyi believes that a community\'s strength is rooted in its culture, and that diaspora communities have a special responsibility to carry that culture forward for generations to come.',
+      imageUrl: '/com3.jpg',
+    },
+    {
+      id: '4',
+      name: 'Ngozi Okeke',
+      title: 'Welfare Officer',
+      bio: 'Ngozi Okeke is the heart of the NPA UK\'s welfare work. As Welfare Officer, she coordinates support for members going through difficult times — whether navigating the UK immigration system, dealing with bereavement, or facing financial hardship.\n\nA qualified social worker with over fifteen years of experience in the NHS and local authority settings, Ngozi brings professional expertise and compassionate humanity to everything she does. She has helped dozens of Nenwe families access the support they need.\n\nNgozi is also a co-founder of the association\'s Women\'s Support Circle, a safe space for Nenwe women in the UK to share experiences and build resilience together.',
+      imageUrl: '/com4.jpg',
+    },
+    {
+      id: '5',
+      name: 'Obinna Ugwu',
+      title: 'Events Coordinator',
+      bio: 'Obinna Ugwu is the architect of the NPA UK\'s vibrant calendar of events. From intimate community dinners to the flagship Annual Fundraising Gala, Obinna ensures that every gathering is memorable, well-organised, and true to the spirit of Ndi Nenwe.\n\nWith a professional background in event management and hospitality, Obinna worked across sectors in London before bringing his skills to community service. He joined the association in 2019 and has grown the events programme significantly since then.\n\nObinna\'s philosophy: every event should leave attendees feeling more connected — to each other, to Nenwe, and to what the association stands for.',
+      imageUrl: '/com5.jpg',
     },
   ],
 
