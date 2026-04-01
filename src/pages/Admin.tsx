@@ -812,7 +812,7 @@ export const Admin = () => {
                               onChange={handleMemberChange(index, 'imageUrl')}
                               className={inputCls}
                               style={inputStyle}
-                              placeholder="/com1.jpeg or https://…"
+                              placeholder="/img1.jpeg or https://…"
                             />
                             {member.imageUrl && (
                               <img
