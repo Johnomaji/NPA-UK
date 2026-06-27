@@ -17,7 +17,9 @@ import {
   ImageIcon,
   SettingsIcon,
   UsersIcon,
+  CalendarIcon,
 } from '../components/Icons';
+import type { EventItem, ProjectItem, NewsItem } from '../data/siteContent';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -54,7 +56,9 @@ const Card = ({ title, children }: CardProps) => (
   </div>
 );
 
-type TabId = 'general' | 'blog' | 'gallery' | 'members';
+type TabId = 'general' | 'events' | 'projects' | 'news' | 'blog' | 'gallery' | 'members';
+
+const PROJECT_STATUSES = ['Active', 'Ongoing', 'Funding', 'Planning'] as const;
 
 // ── Component ──────────────────────────────────────────────────────────────
 
@@ -87,6 +91,9 @@ export const Admin = () => {
     blogPosts: content.blogPosts.map((p) => ({ ...p, body: p.body ?? '', imageUrl: p.imageUrl ?? '' })),
     galleryItems: content.galleryItems.map((i) => ({ ...i })),
     members: content.members.map((m) => ({ ...m, imageUrl: m.imageUrl ?? '' })),
+    events: content.events.map((e) => ({ ...e })),
+    projects: content.projects.map((p) => ({ ...p })),
+    newsItems: content.newsItems.map((n) => ({ ...n })),
   });
 
   // Auto-dismiss saved toast after 3 s
@@ -248,6 +255,57 @@ export const Admin = () => {
       return next;
     });
 
+  const handleEventChange =
+    (index: number, key: keyof EventItem) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setForm((prev) => ({
+        ...prev,
+        events: prev.events.map((ev, i) => (i === index ? { ...ev, [key]: e.target.value } : ev)),
+      }));
+
+  const addEvent = () =>
+    setForm((prev) => ({
+      ...prev,
+      events: [...prev.events, { title: '', date: '', location: '', detail: '' }],
+    }));
+
+  const removeEvent = (index: number) =>
+    setForm((prev) => ({ ...prev, events: prev.events.filter((_, i) => i !== index) }));
+
+  const handleProjectChange =
+    (index: number, key: keyof ProjectItem) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+      setForm((prev) => ({
+        ...prev,
+        projects: prev.projects.map((p, i) => (i === index ? { ...p, [key]: e.target.value } : p)),
+      }));
+
+  const addProject = () =>
+    setForm((prev) => ({
+      ...prev,
+      projects: [...prev.projects, { title: '', status: 'Planning' as const, detail: '' }],
+    }));
+
+  const removeProject = (index: number) =>
+    setForm((prev) => ({ ...prev, projects: prev.projects.filter((_, i) => i !== index) }));
+
+  const handleNewsChange =
+    (index: number, key: keyof NewsItem) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setForm((prev) => ({
+        ...prev,
+        newsItems: prev.newsItems.map((n, i) => (i === index ? { ...n, [key]: e.target.value } : n)),
+      }));
+
+  const addNewsItem = () =>
+    setForm((prev) => ({
+      ...prev,
+      newsItems: [...prev.newsItems, { title: '', date: '', detail: '' }],
+    }));
+
+  const removeNewsItem = (index: number) =>
+    setForm((prev) => ({ ...prev, newsItems: prev.newsItems.filter((_, i) => i !== index) }));
+
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
@@ -279,6 +337,9 @@ export const Admin = () => {
           bio,
           imageUrl: imageUrl || undefined,
         })),
+        events: form.events,
+        projects: form.projects,
+        newsItems: form.newsItems,
       });
       setSavedAt(Date.now());
     },
@@ -304,13 +365,19 @@ export const Admin = () => {
       blogPosts: defaultContent.blogPosts.map((p) => ({ ...p, body: p.body ?? '', imageUrl: p.imageUrl ?? '' })),
       galleryItems: defaultContent.galleryItems.map((i) => ({ ...i })),
       members: defaultContent.members.map((m) => ({ ...m, imageUrl: m.imageUrl ?? '' })),
+      events: defaultContent.events.map((e) => ({ ...e })),
+      projects: defaultContent.projects.map((p) => ({ ...p })),
+      newsItems: defaultContent.newsItems.map((n) => ({ ...n })),
     });
     setSavedAt(Date.now());
   };
 
   const tabs: { id: TabId; label: string; icon: React.ReactNode; count?: number }[] = [
     { id: 'general', label: 'General', icon: <SettingsIcon className="h-3.5 w-3.5" /> },
-    { id: 'blog', label: 'Blog Posts', icon: <ImageIcon className="h-3.5 w-3.5" />, count: form.blogPosts.length },
+    { id: 'events', label: 'Events', icon: <CalendarIcon className="h-3.5 w-3.5" />, count: form.events.length },
+    { id: 'projects', label: 'Projects', icon: <ImageIcon className="h-3.5 w-3.5" />, count: form.projects.length },
+    { id: 'news', label: 'News', icon: <ImageIcon className="h-3.5 w-3.5" />, count: form.newsItems.length },
+    { id: 'blog', label: 'Blog', icon: <ImageIcon className="h-3.5 w-3.5" />, count: form.blogPosts.length },
     { id: 'gallery', label: 'Gallery', icon: <CameraIcon className="h-3.5 w-3.5" />, count: form.galleryItems.length },
     { id: 'members', label: 'Members', icon: <UsersIcon className="h-3.5 w-3.5" />, count: form.members.length },
   ];
@@ -474,6 +541,226 @@ export const Admin = () => {
                 </div>
               )}
             </Card>
+          </div>
+        )}
+
+        {/* ════ EVENTS TAB ════ */}
+        {activeTab === 'events' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-forest">Events</p>
+                <p className="mt-0.5 text-xs text-charcoal/50">{form.events.length} events · shown on Events page and Home</p>
+              </div>
+              <button
+                type="button"
+                onClick={addEvent}
+                className="flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-sand transition hover:brightness-110"
+                style={{ background: 'rgb(var(--color-forest))' }}
+              >
+                <PlusIcon className="h-3 w-3" /> Add Event
+              </button>
+            </div>
+
+            {form.events.length === 0 && (
+              <div
+                className="flex flex-col items-center justify-center rounded-2xl py-16 text-center"
+                style={{ border: '1px dashed rgb(var(--card-border))' }}
+              >
+                <CalendarIcon className="mb-3 h-8 w-8 text-charcoal/20" />
+                <p className="text-sm text-charcoal/40">No events yet.</p>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              {form.events.map((event, index) => (
+                <div
+                  key={index}
+                  className="rounded-2xl space-y-4 p-5"
+                  style={{ border: '1px solid rgb(var(--card-border))', background: 'rgb(var(--card-bg))' }}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span
+                      className="flex h-6 w-6 flex-none items-center justify-center rounded-full text-[10px] font-bold"
+                      style={{ background: 'rgb(var(--card-border))', color: 'rgb(var(--color-charcoal)/0.5)' }}
+                    >
+                      {index + 1}
+                    </span>
+                    <span className="flex-1 truncate text-sm font-semibold text-ink">
+                      {event.title || <span className="italic text-charcoal/30">Untitled event</span>}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeEvent(index)}
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-charcoal/30 transition hover:text-ember"
+                      style={{ border: '1px solid rgb(var(--card-border))' }}
+                    >
+                      <TrashIcon className="h-3 w-3" />
+                    </button>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label="Event Title">
+                      <input value={event.title} onChange={handleEventChange(index, 'title')} className={inputCls} style={inputStyle} placeholder="e.g. Nenwe Cultural Showcase" />
+                    </Field>
+                    <Field label="Date" hint="e.g. June 14, 2026">
+                      <input value={event.date} onChange={handleEventChange(index, 'date')} className={inputCls} style={inputStyle} placeholder="June 14, 2026" />
+                    </Field>
+                    <Field label="Location">
+                      <input value={event.location} onChange={handleEventChange(index, 'location')} className={inputCls} style={inputStyle} placeholder="e.g. London, UK or Virtual" />
+                    </Field>
+                  </div>
+                  <Field label="Description">
+                    <textarea value={event.detail} onChange={handleEventChange(index, 'detail')} rows={2} className={inputCls} style={inputStyle} placeholder="Brief description of the event" />
+                  </Field>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ════ PROJECTS TAB ════ */}
+        {activeTab === 'projects' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-forest">Projects</p>
+                <p className="mt-0.5 text-xs text-charcoal/50">{form.projects.length} projects · shown on Projects page and Home</p>
+              </div>
+              <button
+                type="button"
+                onClick={addProject}
+                className="flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-sand transition hover:brightness-110"
+                style={{ background: 'rgb(var(--color-forest))' }}
+              >
+                <PlusIcon className="h-3 w-3" /> Add Project
+              </button>
+            </div>
+
+            {form.projects.length === 0 && (
+              <div
+                className="flex flex-col items-center justify-center rounded-2xl py-16 text-center"
+                style={{ border: '1px dashed rgb(var(--card-border))' }}
+              >
+                <ImageIcon className="mb-3 h-8 w-8 text-charcoal/20" />
+                <p className="text-sm text-charcoal/40">No projects yet.</p>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              {form.projects.map((project, index) => (
+                <div
+                  key={index}
+                  className="rounded-2xl space-y-4 p-5"
+                  style={{ border: '1px solid rgb(var(--card-border))', background: 'rgb(var(--card-bg))' }}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span
+                      className="flex h-6 w-6 flex-none items-center justify-center rounded-full text-[10px] font-bold"
+                      style={{ background: 'rgb(var(--card-border))', color: 'rgb(var(--color-charcoal)/0.5)' }}
+                    >
+                      {index + 1}
+                    </span>
+                    <span className="flex-1 truncate text-sm font-semibold text-ink">
+                      {project.title || <span className="italic text-charcoal/30">Untitled project</span>}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeProject(index)}
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-charcoal/30 transition hover:text-ember"
+                      style={{ border: '1px solid rgb(var(--card-border))' }}
+                    >
+                      <TrashIcon className="h-3 w-3" />
+                    </button>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label="Project Title">
+                      <input value={project.title} onChange={handleProjectChange(index, 'title')} className={inputCls} style={inputStyle} placeholder="e.g. Rural Water Access" />
+                    </Field>
+                    <Field label="Status">
+                      <select value={project.status} onChange={handleProjectChange(index, 'status')} className={inputCls} style={inputStyle}>
+                        {PROJECT_STATUSES.map((s) => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
+                    </Field>
+                  </div>
+                  <Field label="Description">
+                    <textarea value={project.detail} onChange={handleProjectChange(index, 'detail')} rows={2} className={inputCls} style={inputStyle} placeholder="Brief description of the project" />
+                  </Field>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ════ NEWS TAB ════ */}
+        {activeTab === 'news' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-forest">News Items</p>
+                <p className="mt-0.5 text-xs text-charcoal/50">{form.newsItems.length} items · shown on News page</p>
+              </div>
+              <button
+                type="button"
+                onClick={addNewsItem}
+                className="flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-sand transition hover:brightness-110"
+                style={{ background: 'rgb(var(--color-forest))' }}
+              >
+                <PlusIcon className="h-3 w-3" /> Add Item
+              </button>
+            </div>
+
+            {form.newsItems.length === 0 && (
+              <div
+                className="flex flex-col items-center justify-center rounded-2xl py-16 text-center"
+                style={{ border: '1px dashed rgb(var(--card-border))' }}
+              >
+                <ImageIcon className="mb-3 h-8 w-8 text-charcoal/20" />
+                <p className="text-sm text-charcoal/40">No news items yet.</p>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              {form.newsItems.map((item, index) => (
+                <div
+                  key={index}
+                  className="rounded-2xl space-y-4 p-5"
+                  style={{ border: '1px solid rgb(var(--card-border))', background: 'rgb(var(--card-bg))' }}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span
+                      className="flex h-6 w-6 flex-none items-center justify-center rounded-full text-[10px] font-bold"
+                      style={{ background: 'rgb(var(--card-border))', color: 'rgb(var(--color-charcoal)/0.5)' }}
+                    >
+                      {index + 1}
+                    </span>
+                    <span className="flex-1 truncate text-sm font-semibold text-ink">
+                      {item.title || <span className="italic text-charcoal/30">Untitled item</span>}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeNewsItem(index)}
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-charcoal/30 transition hover:text-ember"
+                      style={{ border: '1px solid rgb(var(--card-border))' }}
+                    >
+                      <TrashIcon className="h-3 w-3" />
+                    </button>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label="Headline">
+                      <input value={item.title} onChange={handleNewsChange(index, 'title')} className={inputCls} style={inputStyle} placeholder="e.g. Scholarship Applications Open" />
+                    </Field>
+                    <Field label="Date" hint="e.g. March 12, 2026">
+                      <input value={item.date} onChange={handleNewsChange(index, 'date')} className={inputCls} style={inputStyle} placeholder="March 12, 2026" />
+                    </Field>
+                  </div>
+                  <Field label="Summary">
+                    <textarea value={item.detail} onChange={handleNewsChange(index, 'detail')} rows={2} className={inputCls} style={inputStyle} placeholder="Brief summary of the news item" />
+                  </Field>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

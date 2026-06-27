@@ -5,12 +5,6 @@ export const languageOptions: { value: Language; label: string }[] = [
   { value: 'ig', label: 'Igbo' },
 ];
 
-type TranslationItem = {
-  title: string;
-  date: string;
-  detail: string;
-};
-
 type Translations = {
   common: {
     kicker: string;
@@ -63,18 +57,15 @@ type Translations = {
     title: string;
     subtitle: string;
     rsvp: string;
-    items: TranslationItem[];
   };
   projects: {
     title: string;
     subtitle: string;
-    items: { title: string; status: string; detail: string }[];
   };
   news: {
     title: string;
     subtitle: string;
     featured: string;
-    items: TranslationItem[];
   };
   blog: {
     title: string;
@@ -196,71 +187,15 @@ const translations: Record<Language, Translations> = {
       title: 'Events',
       subtitle: 'Gatherings that strengthen our diaspora ties and deepen our impact in Nenwe.',
       rsvp: 'RSVP',
-      items: [
-        {
-          title: 'Nenwe Cultural Showcase',
-          date: 'June 14, 2026',
-          detail: 'An evening of music, dance, and Igbo storytelling.',
-        },
-        {
-          title: 'Community Town Hall',
-          date: 'July 5, 2026',
-          detail: 'Strategy updates, member feedback, and project planning.',
-        },
-        {
-          title: 'Youth Leadership Retreat',
-          date: 'August 20, 2026',
-          detail: 'Leadership, mentorship, and career development workshops.',
-        },
-      ],
     },
     projects: {
       title: 'Projects',
       subtitle: 'Community-driven initiatives that deliver real, measurable impact in Nenwe.',
-      items: [
-        {
-          title: 'Rural Water Access',
-          status: 'Active',
-          detail: 'Borehole installations and hygiene education across three Nenwe communities.',
-        },
-        {
-          title: 'STEM Mentorship',
-          status: 'Ongoing',
-          detail: 'Volunteer mentors guide students in coding, robotics, and career pathways.',
-        },
-        {
-          title: 'Women in Enterprise Fund',
-          status: 'Funding',
-          detail: 'Micro-grants and coaching for women-owned businesses.',
-        },
-        {
-          title: 'Health Outreach Mission',
-          status: 'Planning',
-          detail: 'Quarterly health screenings and maternal support programs.',
-        },
-      ],
     },
     news: {
       title: 'News & Announcements',
       subtitle: 'Updates, community news, and opportunities to get involved.',
       featured: 'Featured Announcement',
-      items: [
-        {
-          title: 'Scholarship Applications Open',
-          date: 'March 12, 2026',
-          detail: 'Applications are open for Nenwe secondary school scholarships.',
-        },
-        {
-          title: 'Diaspora Business Network',
-          date: 'February 28, 2026',
-          detail: 'Launching a network to connect Nenwe entrepreneurs globally.',
-        },
-        {
-          title: 'Volunteer Drive',
-          date: 'January 18, 2026',
-          detail: 'We are recruiting volunteers for mentorship and outreach.',
-        },
-      ],
     },
     blog: {
       title: 'Blog',
@@ -381,71 +316,15 @@ const translations: Record<Language, Translations> = {
       title: 'Ihe Omume',
       subtitle: 'Nzụkọ na-eme ka anyị jikọta ọnụ ma welite mmetụta anyị na Nenwe.',
       rsvp: 'RSVP',
-      items: [
-        {
-          title: 'Ngosi Omenala Nenwe',
-          date: 'June 14, 2026',
-          detail: 'An evening of music, dance, and Igbo storytelling.',
-        },
-        {
-          title: 'Ọgbakọ Ndị Obodo',
-          date: 'July 5, 2026',
-          detail: 'Strategy updates, member feedback, and project planning.',
-        },
-        {
-          title: 'Nzukọ Ndu Ndị Ntọrịa',
-          date: 'August 20, 2026',
-          detail: 'Leadership, mentorship, and career development workshops.',
-        },
-      ],
     },
     projects: {
       title: 'Ọrụ',
       subtitle: 'Mmemme obodo na-eweta ezigbo mmetụta na Nenwe.',
-      items: [
-        {
-          title: 'Mmiri N\'ime Ụlọ Ọrụ',
-          status: 'Na-arụsi Ọrụ',
-          detail: 'Borehole installations and hygiene education across three Nenwe communities.',
-        },
-        {
-          title: 'Nduzi STEM',
-          status: 'Na-aga n\'ihu',
-          detail: 'Volunteer mentors guide students in coding, robotics, and career pathways.',
-        },
-        {
-          title: 'Ọrụ Ndị Ụmụnwaanyị Na-azụ Ahịa',
-          status: 'Nkwado Ego',
-          detail: 'Micro-grants and coaching for women-owned businesses.',
-        },
-        {
-          title: 'Ọrụ Nlekọta Ahụ Ike',
-          status: 'Na-eme atụmatụ',
-          detail: 'Quarterly health screenings and maternal support programs.',
-        },
-      ],
     },
     news: {
       title: 'Akụkọ & Mgbasa Ozi',
       subtitle: 'Mmelite, akụkọ obodo, na ohere isonye.',
       featured: 'Mgbasa Ozi Pụrụ Iche',
-      items: [
-        {
-          title: 'Nnabata Scholarship Meghere',
-          date: 'March 12, 2026',
-          detail: 'Applications are open for Nenwe secondary school scholarships.',
-        },
-        {
-          title: 'Netwọk Azụmahịa Diaspora',
-          date: 'February 28, 2026',
-          detail: 'Launching a network to connect Nenwe entrepreneurs globally.',
-        },
-        {
-          title: 'Mgbalị Ndị Ọrụ Ọhaneze',
-          date: 'January 18, 2026',
-          detail: 'We are recruiting volunteers for mentorship and outreach.',
-        },
-      ],
     },
     blog: {
       title: 'Blọgụ',

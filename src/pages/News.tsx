@@ -42,7 +42,7 @@ export const News = () => {
 
       {/* ── News grid ── */}
       <div className="grid gap-5 md:grid-cols-3">
-        {t.news.items.map((item, i) => (
+        {content.newsItems.map((item, i) => (
           <article
             key={item.title}
             className="card group flex flex-col p-7 space-y-4"

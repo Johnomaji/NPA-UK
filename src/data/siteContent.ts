@@ -22,6 +22,25 @@ export type CommunityMember = {
   imageUrl?: string;
 };
 
+export type EventItem = {
+  title: string;
+  date: string;
+  location: string;
+  detail: string;
+};
+
+export type ProjectItem = {
+  title: string;
+  status: 'Active' | 'Ongoing' | 'Funding' | 'Planning';
+  detail: string;
+};
+
+export type NewsItem = {
+  title: string;
+  date: string;
+  detail: string;
+};
+
 export type SiteContent = {
   heroHeadline: string;
   heroSubheadline: string;
@@ -38,6 +57,9 @@ export type SiteContent = {
   blogPosts: BlogPost[];
   galleryItems: GalleryItem[];
   members: CommunityMember[];
+  events: EventItem[];
+  projects: ProjectItem[];
+  newsItems: NewsItem[];
 };
 
 const UNS = 'https://images.unsplash.com/photo-';
@@ -158,24 +180,91 @@ export const defaultContent: SiteContent = {
     },
   ],
 
+  events: [
+    {
+      title: 'Nenwe Cultural Showcase',
+      date: 'June 14, 2026',
+      location: 'London, UK',
+      detail: 'An evening of music, dance, and Igbo storytelling.',
+    },
+    {
+      title: 'Community Town Hall',
+      date: 'July 5, 2026',
+      location: 'Virtual',
+      detail: 'Strategy updates, member feedback, and project planning.',
+    },
+    {
+      title: 'Youth Leadership Retreat',
+      date: 'August 20, 2026',
+      location: 'Nenwe',
+      detail: 'Leadership, mentorship, and career development workshops.',
+    },
+  ],
+
+  projects: [
+    {
+      title: 'Rural Water Access',
+      status: 'Active',
+      detail: 'Borehole installations and hygiene education across three Nenwe communities.',
+    },
+    {
+      title: 'STEM Mentorship',
+      status: 'Ongoing',
+      detail: 'Volunteer mentors guide students in coding, robotics, and career pathways.',
+    },
+    {
+      title: 'Women in Enterprise Fund',
+      status: 'Funding',
+      detail: 'Micro-grants and coaching for women-owned businesses.',
+    },
+    {
+      title: 'Health Outreach Mission',
+      status: 'Planning',
+      detail: 'Quarterly health screenings and maternal support programs.',
+    },
+  ],
+
+  newsItems: [
+    {
+      title: 'Scholarship Applications Open',
+      date: 'March 12, 2026',
+      detail: 'Applications are open for Nenwe secondary school scholarships.',
+    },
+    {
+      title: 'Diaspora Business Network',
+      date: 'February 28, 2026',
+      detail: 'Launching a network to connect Nenwe entrepreneurs globally.',
+    },
+    {
+      title: 'Volunteer Drive',
+      date: 'January 18, 2026',
+      detail: 'We are recruiting volunteers for mentorship and outreach.',
+    },
+  ],
+
   galleryItems: [
-    { title: 'Community Outreach in Nenwe' },
-    { title: 'Cultural Night in London' },
-    { title: 'Youth Mentorship Session' },
-    { title: 'Diaspora Business Meetup' },
-    { title: 'Health Outreach Mission' },
-    { title: 'Scholarship Award Ceremony' },
-    { title: 'Annual General Meeting 2025' },
-    { title: 'School Outreach Day' },
-    { title: "Women's Enterprise Workshop" },
-    { title: 'Health Fair 2025' },
-    { title: 'Community Clean-Up Drive' },
-    { title: 'Youth Sports Day' },
-    { title: "Elders' Recognition Ceremony" },
-    { title: 'Food Bank Initiative' },
-    { title: 'Digital Skills Workshop' },
-    { title: 'Cultural Dance Performance' },
-    { title: 'Thanksgiving Service' },
-    { title: 'NPA UK Annual Dinner' },
+    { title: 'Community Outreach in Nenwe',    imageUrl: '/unnamed.jpg' },
+    { title: 'Cultural Night in London',        imageUrl: '/unnamed%20(1).jpg' },
+    { title: 'Youth Mentorship Session',        imageUrl: '/unnamed%20(2).jpg' },
+    { title: 'Diaspora Business Meetup',        imageUrl: '/unnamed%20(3).jpg' },
+    { title: 'Health Outreach Mission',         imageUrl: '/unnamed%20(4).jpg' },
+    { title: 'Scholarship Award Ceremony',      imageUrl: '/unnamed%20(5).jpg' },
+    { title: 'Annual General Meeting 2025',     imageUrl: '/unnamed%20(6).jpg' },
+    { title: 'School Outreach Day',             imageUrl: '/unnamed%20(7).jpg' },
+    { title: "Women's Enterprise Workshop",     imageUrl: '/unnamed%20(8).jpg' },
+    { title: 'Health Fair 2025',               imageUrl: '/unnamed%20(9).jpg' },
+    { title: 'Community Clean-Up Drive',        imageUrl: '/unnamed%20(10).jpg' },
+    { title: 'Youth Sports Day',               imageUrl: '/unnamed%20(11).jpg' },
+    { title: "Elders' Recognition Ceremony",   imageUrl: '/unnamed%20(12).jpg' },
+    { title: 'Food Bank Initiative',           imageUrl: '/unnamed%20(13).jpg' },
+    { title: 'Digital Skills Workshop',        imageUrl: '/unnamed%20(14).jpg' },
+    { title: 'Cultural Dance Performance',     imageUrl: '/unnamed%20(15).jpg' },
+    { title: 'Thanksgiving Service',           imageUrl: '/unnamed%20(16).jpg' },
+    { title: 'NPA UK Annual Dinner',           imageUrl: '/unnamed%20(17).jpg' },
+    { title: 'Community Meeting 2025',         imageUrl: '/unnamed%20(18).jpg' },
+    { title: 'Fundraising Gala',               imageUrl: '/unnamed%20(19).jpg' },
+    { title: 'Heritage Day Celebration',       imageUrl: '/unnamed%20(20).jpg' },
+    { title: 'Association Gathering',          imageUrl: '/IMG_6758%20(1).jpeg' },
+    { title: 'NPA UK Members',                imageUrl: '/IMG_6759%20(1).jpeg' },
   ],
 };

@@ -28,7 +28,7 @@ export const Events = () => {
           style={{ background: 'linear-gradient(to bottom, rgb(var(--color-forest)/0.4), transparent)' }}
         />
 
-        {t.events.items.map((event, i) => {
+        {content.events.map((event, i) => {
           const d = parseDate(event.date);
           const isHighlighted = i === 1;
           return (
@@ -77,7 +77,15 @@ export const Events = () => {
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="space-y-1">
                     <p className="text-xl font-bold text-ink">{event.title}</p>
-                    <p className="hidden text-xs text-charcoal/40 md:block">{event.date}</p>
+                    <div className="hidden items-center gap-3 md:flex">
+                      <p className="text-xs text-charcoal/40">{event.date}</p>
+                      {event.location && (
+                        <>
+                          <span className="text-charcoal/20">·</span>
+                          <p className="text-xs text-charcoal/40">{event.location}</p>
+                        </>
+                      )}
+                    </div>
                   </div>
                   <button
                     className="flex-none rounded-full px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] transition hover:brightness-110"
@@ -94,6 +102,9 @@ export const Events = () => {
                   </button>
                 </div>
                 <p className="text-sm leading-relaxed text-charcoal/60">{event.detail}</p>
+                {event.location && (
+                  <p className="text-xs text-charcoal/40 md:hidden">{event.location}</p>
+                )}
               </div>
             </div>
           );

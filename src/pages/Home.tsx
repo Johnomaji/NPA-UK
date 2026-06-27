@@ -10,31 +10,6 @@ const stats = [
   { key: 'scholarships', value: '40' },
 ];
 
-const events = [
-  { title: 'Nenwe Cultural Showcase', date: 'June 14, 2026', location: 'London, UK' },
-  { title: 'Community Town Hall', date: 'July 5, 2026', location: 'Virtual' },
-  { title: 'Youth Leadership Retreat', date: 'August 20, 2026', location: 'Nenwe' },
-];
-
-const projects = [
-  {
-    num: '01',
-    title: 'Rural Water Access',
-    detail: 'Borehole installations and hygiene education across Nenwe communities.',
-  },
-  {
-    num: '02',
-    title: 'STEM Mentorship',
-    detail: 'Weekly online mentoring connecting UK professionals with Nenwe students.',
-    highlight: true,
-  },
-  {
-    num: '03',
-    title: 'Women in Enterprise',
-    detail: 'Micro-grants and coaching for women-owned businesses in Nenwe.',
-  },
-];
-
 export const Home = () => {
   const { content } = useSiteContentContext();
   const t = getTranslations(content.language);
@@ -187,7 +162,7 @@ export const Home = () => {
       {/* ── Upcoming Events ── */}
       <Section kicker={t.home.upcomingKicker} title={t.home.upcomingTitle}>
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-          {events.map((event) => (
+          {content.events.slice(0, 3).map((event) => (
             <div key={event.title} className="card group space-y-3 p-5 sm:p-6">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-forest">
                 {event.date}
@@ -195,13 +170,15 @@ export const Home = () => {
               <p className="text-base font-semibold text-ink transition-colors group-hover:text-forest">
                 {event.title}
               </p>
-              <div className="flex items-center gap-2 text-xs text-charcoal/50">
-                <span
-                  className="inline-block h-1.5 w-1.5 rounded-full"
-                  style={{ background: 'rgb(var(--color-forest))' }}
-                />
-                {event.location}
-              </div>
+              {event.location && (
+                <div className="flex items-center gap-2 text-xs text-charcoal/50">
+                  <span
+                    className="inline-block h-1.5 w-1.5 rounded-full"
+                    style={{ background: 'rgb(var(--color-forest))' }}
+                  />
+                  {event.location}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -218,35 +195,36 @@ export const Home = () => {
       {/* ── Impact / Projects ── */}
       <Section kicker={t.home.impactKicker} title="Projects shaping" accent="Nenwe.">
         <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3">
-          {projects.map((project) => (
-            <div
-              key={project.title}
-              className="card group space-y-4 p-6 sm:p-7"
-              style={
-                project.highlight
-                  ? {
-                      borderColor: 'rgb(var(--color-ember) / 0.35)',
-                      background: 'rgb(var(--color-ember) / 0.04)',
-                    }
-                  : {}
-              }
-            >
-              <p
-                className="font-display text-4xl font-bold leading-none"
-                style={{
-                  color: project.highlight
-                    ? 'rgb(var(--color-ember))'
-                    : 'rgb(var(--color-forest))',
-                }}
+          {content.projects.slice(0, 3).map((project, i) => {
+            const highlight = i === 1;
+            return (
+              <div
+                key={project.title}
+                className="card group space-y-4 p-6 sm:p-7"
+                style={
+                  highlight
+                    ? {
+                        borderColor: 'rgb(var(--color-ember) / 0.35)',
+                        background: 'rgb(var(--color-ember) / 0.04)',
+                      }
+                    : {}
+                }
               >
-                {project.num}.
-              </p>
-              <p className="text-base font-semibold text-ink transition-colors group-hover:text-forest">
-                {project.title}
-              </p>
-              <p className="text-sm leading-relaxed text-charcoal/70">{project.detail}</p>
-            </div>
-          ))}
+                <p
+                  className="font-display text-4xl font-bold leading-none"
+                  style={{
+                    color: highlight ? 'rgb(var(--color-ember))' : 'rgb(var(--color-forest))',
+                  }}
+                >
+                  {String(i + 1).padStart(2, '0')}.
+                </p>
+                <p className="text-base font-semibold text-ink transition-colors group-hover:text-forest">
+                  {project.title}
+                </p>
+                <p className="text-sm leading-relaxed text-charcoal/70">{project.detail}</p>
+              </div>
+            );
+          })}
         </div>
         <div className="text-right">
           <Link

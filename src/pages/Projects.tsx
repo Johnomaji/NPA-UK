@@ -13,7 +13,7 @@ export const Projects = () => {
   const { content } = useSiteContentContext();
   const t = getTranslations(content.language);
 
-  const statusCounts = t.projects.items.reduce<Record<string, number>>((acc, p) => {
+  const statusCounts = content.projects.reduce<Record<string, number>>((acc, p) => {
     acc[p.status] = (acc[p.status] ?? 0) + 1;
     return acc;
   }, {});
@@ -44,7 +44,7 @@ export const Projects = () => {
 
       {/* Project cards */}
       <div className="grid gap-5 md:grid-cols-2">
-        {t.projects.items.map((project, i) => {
+        {content.projects.map((project, i) => {
           const cfg = statusConfig[project.status] ?? statusConfig.Planning;
           return (
             <div key={project.title} className="card group p-8 space-y-6">
