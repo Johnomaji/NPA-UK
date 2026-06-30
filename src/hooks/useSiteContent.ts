@@ -31,6 +31,19 @@ const readContent = (): SiteContent => {
       }
     }
 
+    // Merge members by index so updated names/bios show, but admin-uploaded
+    // photos from Supabase are preserved.
+    if (stored.members) {
+      merged.members = defaultContent.members.map((def, i) => {
+        const saved = stored.members![i];
+        if (!saved) return def;
+        return { ...def, ...saved, name: def.name, imageUrl: saved.imageUrl || def.imageUrl };
+      });
+      if (stored.members.length > defaultContent.members.length) {
+        merged.members.push(...stored.members.slice(defaultContent.members.length));
+      }
+    }
+
     return merged;
   } catch {
     return defaultContent;
