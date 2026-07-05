@@ -39,19 +39,13 @@ export const MemberDetail = () => {
       >
         {/* Photo */}
         {member.imageUrl ? (
-          <div className="relative h-72 overflow-hidden sm:h-96">
-            <img
-              src={member.imageUrl}
-              alt={member.name}
-              className="h-full w-full object-cover object-top"
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background: 'linear-gradient(to top, rgb(var(--card-bg)) 0%, transparent 55%)',
-              }}
-            />
-          </div>
+          <img
+            src={member.imageUrl}
+            alt={member.name}
+            className="w-full max-h-[80vh] object-contain"
+            style={{ background: 'rgb(var(--color-forest)/0.08)' }}
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+          />
         ) : (
           <div
             className="flex h-52 items-center justify-center"

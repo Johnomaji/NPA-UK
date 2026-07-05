@@ -330,6 +330,7 @@ export const Admin = () => {
           imageUrl: imageUrl || undefined,
         })),
         galleryItems: form.galleryItems,
+        dataVersion: defaultContent.dataVersion,
         members: form.members.map(({ id, name, title, bio, imageUrl }) => ({
           id,
           name,

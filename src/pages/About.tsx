@@ -163,27 +163,25 @@ export const About = () => {
               className="card group flex flex-col overflow-hidden p-0 transition-transform hover:-translate-y-1"
             >
               {/* Photo */}
-              {member.imageUrl ? (
-                <div className="relative h-48 overflow-hidden">
+              <div
+                className="relative flex h-48 items-center justify-center overflow-hidden"
+                style={{ background: 'rgb(var(--color-forest)/0.08)' }}
+              >
+                <span
+                  className="font-display text-4xl font-bold"
+                  style={{ color: 'rgb(var(--color-forest)/0.3)' }}
+                >
+                  {member.name.charAt(0)}
+                </span>
+                {member.imageUrl && (
                   <img
                     src={member.imageUrl}
                     alt={member.name}
-                    className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                    className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
-                </div>
-              ) : (
-                <div
-                  className="flex h-48 items-center justify-center"
-                  style={{ background: 'rgb(var(--color-forest)/0.08)' }}
-                >
-                  <span
-                    className="font-display text-4xl font-bold"
-                    style={{ color: 'rgb(var(--color-forest)/0.3)' }}
-                  >
-                    {member.name.charAt(0)}
-                  </span>
-                </div>
-              )}
+                )}
+              </div>
               {/* Info */}
               <div className="space-y-1 p-5">
                 <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-forest">

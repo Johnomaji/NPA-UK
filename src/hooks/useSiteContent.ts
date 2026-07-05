@@ -31,17 +31,28 @@ const readContent = (): SiteContent => {
       }
     }
 
-    // Merge members by index so updated names/bios show, but admin-uploaded
-    // photos from Supabase are preserved.
+    // Merge members by ID — bios and titles always come from defaultContent
+    // so stale localStorage data can never override real bios in the code.
+    // Only the admin-uploaded imageUrl is taken from stored data.
     if (stored.members) {
-      merged.members = defaultContent.members.map((def, i) => {
-        const saved = stored.members![i];
+      const savedById = new Map(
+        stored.members.filter(m => m.id).map(m => [m.id, m])
+      );
+      const defaultIds = new Set(defaultContent.members.map(m => m.id));
+
+      merged.members = defaultContent.members.map((def) => {
+        const saved = savedById.get(def.id);
         if (!saved) return def;
-        return { ...def, ...saved, name: def.name, imageUrl: saved.imageUrl || def.imageUrl };
+        // If defaultContent already has a real local path, always use it so
+        // stale Supabase URLs in localStorage can't override local photos.
+        const imageUrl = def.imageUrl?.startsWith('/member/')
+          ? def.imageUrl
+          : (saved.imageUrl || def.imageUrl);
+        return { ...def, imageUrl };
       });
-      if (stored.members.length > defaultContent.members.length) {
-        merged.members.push(...stored.members.slice(defaultContent.members.length));
-      }
+      // Keep admin-added members (IDs not in defaults)
+      const extra = stored.members.filter(m => m.id && !defaultIds.has(m.id));
+      merged.members.push(...extra);
     }
 
     return merged;

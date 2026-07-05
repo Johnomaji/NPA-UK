@@ -54,6 +54,7 @@ export type SiteContent = {
   announcement: string;
   theme: ThemeName;
   language: Language;
+  dataVersion?: number;
   blogPosts: BlogPost[];
   galleryItems: GalleryItem[];
   members: CommunityMember[];
@@ -82,6 +83,7 @@ export const defaultContent: SiteContent = {
     'March 2026: Community development fund now open for project proposals. Submit your idea before April 30, 2026.',
   theme: 'heritage',
   language: 'en',
+  dataVersion: 1,
 
   blogPosts: [
     {
@@ -144,116 +146,109 @@ export const defaultContent: SiteContent = {
 
   members: [
     {
-      id: '1',
-      name: 'Paul',
-      title: 'Hekegeh',
-      bio: 'Fajdhdjdg',
-      imageUrl: '/img1.jpg',
-    },
-    {
       id: '2',
       name: 'Kenneth Ejim',
       title: 'General Secretary',
       bio: 'Kenneth Kenechukwu Ejim is a native of Umuagom-Ngwokeleze, Enugunato, Uhueze, Nenwe in Aninri LGA of Enugu State, Nigeria. He lives in Manchester, United Kingdom with his family.\n\nKen Ejim is the Inaugural General Secretary of the Association and one of the founding members of NPA UK. He is a Lawyer by training, but currently works in a UK civil service department.',
-      imageUrl: '/img2.jpg',
+      imageUrl: '/member/IMG_1328-81%20-%20Kenneth%20K.%20Ejim.jpg.jpeg',
     },
     {
       id: '3',
       name: 'Mr Donatus Okoronkwo',
       title: 'Member',
       bio: 'I am from Umuekwengele, Emudo Nenwe. Married with children. Currently living in the United Kingdom.',
-      imageUrl: '/img3.jpg',
+      imageUrl: '/member/temp_image_BC900FE0-4FEC-4502-BD62-457508B19DD5%20-%20DONATUS%20NDUBUISI%20OKORONKWO.webp',
     },
     {
       id: '4',
       name: 'Dr Ugochukwu Innocent Nweke',
       title: 'Chairman',
       bio: 'Dr. Innocent Ugochukwu Nweke (PhD, RNLD) is the Chairman and Managing Director of Social Work Innovations Ltd, specialists in Child Protection, Corporate Parenting & Family Safeguarding consultancy services.\n\nDr. Nweke is a distinguished consultant social worker with expertise in dysfunctional family safeguarding, child protection services, and corporate parenting. He works across the United Kingdom and is currently working on contracts with a Local Authority in West Midlands.\n\nDr. Nweke earned a First Class bachelor\'s degree in social work and nursing practices from London South Bank University, followed by a Master\'s degree with Merit from London Metropolitan University. He later completed his PhD in Social Work at the University of Kent, Canterbury.\n\nOriginally from Enugunato Uhueze Nenwe, Dr. Nweke was born to Late Matthew Igbokwe Nweke and late Mrs Justina Nwakaego Nweke, and raised in Jos, Plateau State, Nigeria. He has remained deeply connected to his roots and currently serves as the Chairman of the Nenwe Progressive Association United Kingdom (NPAUK), a role he has held since its founding in 2009. He is also the Assistant Chairman of Nenwe in Diaspora (NiDA).\n\nDr. Nweke is a Board of Trustees member of the Coalition for the Protection of Democracy (COPDEM), a diaspora-based policy-focused think tank committed to restoring true democratic values in Nigeria. He is also the Secretary of the Nigeria Democratic Congress (NDC) in the United Kingdom.\n\nHe is married to Mrs Queen Esther Ugo-Nweke and they have three children together.',
-      imageUrl: '/img4.jpg',
+      imageUrl: '/member/IMG_8193%20-%20Innocent%20Nweke.jpeg',
     },
     {
       id: '5',
       name: 'Ernest Ikechukwu Chukwu',
       title: 'Member',
       bio: 'Name: Ernest Ikechukwu Chukwu\nVillage: Emudo Nenwe\nResidence: Manchester',
-      imageUrl: '/img5.jpg',
+      imageUrl: '/member/IMG20260510172043%20-%20Ernest%20Ikechukwu.jpg.jpeg',
     },
     {
       id: '6',
       name: 'Timothy Nnamdi Ejim',
       title: 'Member',
       bio: 'A native of Umuagom Ngwokeleze, Elugwulato Uhueze Nenwe. Lives in the East Midlands of England, UK.',
-      imageUrl: '/img6.jpg',
+      imageUrl: '/member/20251230_153826%20-%20Timothy%20Ejim.jpg.jpeg',
     },
     {
       id: '7',
       name: 'Chidiebere Christian Akpa',
       title: 'Member',
       bio: 'Chidiebere Christian Akpa is from Obeagu Uhueze Nenwe in Aninri Local Government Area of Enugu State. He lives in Manchester, United Kingdom.',
-      imageUrl: '/img7.jpg',
+      imageUrl: '/member/1782569384785%20-%20Masterpress%20Chris%20chidi.jpg.jpeg',
     },
     {
       id: '8',
       name: 'Alexander Ifeanyi Chukwu',
       title: 'Member',
       bio: 'Alexander is from Ugwu-Okpa, Umuekuma, Emudo Nenwe. A Licensed Practicing Pharmacist for over a decade in Nigeria before moving to the UK. He holds a Master\'s degree in Drug Discovery and Development and is presently working with NHS England. A Christian passionate about service and worship of God.',
-      imageUrl: '/img8.jpg',
+      imageUrl: '/member/IMG_20250613_102505_103332%20-%20Alexander%20Ifeanyi%20Chukwu.jpg.jpeg',
     },
     {
       id: '9',
       name: 'Pius Kenechukwu Onwe',
       title: 'Member',
       bio: 'My name is Pius Kenechukwu Onwe, mostly known as KC Onwe. I am a father of three — two girls and a boy — married to my lovely wife Emma, who is originally from Scotland. I am from Eziecho Uhueze Nenwe, and live in Edinburgh, Scotland, United Kingdom.\n\nI work in a bank as a Project Manager and also run property management services as a side business.',
-      imageUrl: '/img9.jpg',
+      imageUrl: '/member/20251223_193336%20-%20KC%20Pius%20Onwe.jpg.jpeg',
     },
     {
       id: '10',
       name: 'Gregory Patrick Udeh',
       title: 'Member',
       bio: 'I am an Accountant and a Registered MHN. I hail from Eziecho, Uhueze, Nenwe and reside in London, United Kingdom.',
-      imageUrl: '/img10.jpg',
+      imageUrl: '/member/20240207_142533%20-%20Gregory%20Patrick%20Udeh.jpg.jpeg',
     },
     {
       id: '11',
       name: 'Dr Chibuzor Christian Ndubuisi',
       title: 'Publicity Secretary',
       bio: 'I live in the North East of England. I am from Umuewo Uhueze Nenwe.',
-      imageUrl: '/img11.jpg',
+      imageUrl: '/member/IMG-20250713-WA0008%20-%20Christian%20Ndubuisi.jpg.jpeg',
     },
     {
       id: '12',
       name: 'Chukwumba Johnbosco Ugochukwu',
       title: 'Member',
       bio: 'My name is Johnbosco Ugochukwu Chukwumba (Ogbuevi Ugonabuo), from Umuchoke Umudibo, Amoji Nenwe. I currently reside in Portsmouth, Hampshire, United Kingdom, where I work as a Prison Officer and Mental Health Support Worker. I also hold the office of Immigration Officer in Nigeria and remain available to assist with any related services.\n\nI am married to Barr. (Mrs.) Ifeatu Chukwumba, a social worker, and together we are blessed with three children. I am deeply passionate about the growth and development of Nenwe, and my intention has always been to contribute my quota towards lifting our community — promoting peace, love, and unity in all matters affecting Nenwe. I remain committed to supporting initiatives that drive progress and unity for our people.',
-      imageUrl: '/img12.jpg',
+      imageUrl: '/member/20260627_112256%20-%20JOHNBOSCO%20CHUKWUMBA.jpg.jpeg',
     },
     {
       id: '13',
       name: 'Casmir Chukwunta',
       title: 'Member',
       bio: 'A committed member dedicated to promoting unity, community development, and the welfare of our people. Passionate about working with others to preserve our heritage and contribute to the growth and progress of our town.',
-      imageUrl: '/img13.jpg',
+      imageUrl: '/member/20251220_222942%20-%20cas%20Chukwunta.jpg',
     },
     {
       id: '14',
       name: 'Chinedu Peter Anieze',
       title: 'Member',
       bio: 'Chinedu Anieze is a Social Support Worker based in Edinburgh, United Kingdom, with a longstanding commitment to community service, charitable initiatives, and humanitarian support. He has dedicated many years to serving and empowering individuals, families, and communities through compassionate leadership, advocacy, and voluntary service.\n\nHe has held several notable leadership positions, including Vice President and General Secretary of the Nigeria Community in Edinburgh (NCIE-UK), Chairman of Eziecho Community Abroad, and Chairman of the Umungele Clan of Eziecho Community. In these capacities, he has championed community development, promoted unity and cultural values, and supported initiatives that improve the welfare of community members.\n\nHaving travelled extensively, Chinedu brings a broad international perspective to his work and values collaboration across diverse cultures and backgrounds. He is widely recognised as a trusted mentor and guide to numerous individuals, relatives, and families.\n\nA devoted husband and proud father of two, Chinedu believes that strong families and compassionate leadership are the foundation of vibrant communities. He remains committed to advancing charitable causes, fostering social inclusion, and making a meaningful and lasting contribution to society through integrity, service, and selfless leadership.',
-      imageUrl: '/img14.jpg',
+      imageUrl: '/member/IMG_1920%20-%20Chinedu%20Anieze.jpeg',
     },
     {
       id: '15',
       name: 'Pascal Ofobuike Okereke',
       title: 'Member',
       bio: 'A dedicated healthcare professional with a background in Chemical Engineering and a passion for improving lives through patient care.\n\nA UK Registered Nurse committed to delivering compassionate, evidence-based healthcare with professionalism and integrity.\n\nDriven by continuous learning, excellence, and a desire to make a meaningful impact in both healthcare and beyond.',
-      imageUrl: '/img15.jpg',
+      imageUrl: '/member/IMG-20260604-WA0001%20-%20Pascal%20Ofobuike.jpg.jpeg',
     },
     {
       id: '16',
       name: 'Mr Celestine Eze',
       title: 'Member',
       bio: 'From Amoji Nenwe.',
-      imageUrl: '/img16.jpg',
+      imageUrl: '/member/20230723_134852%20-%20Celetrancy%20Johnsonwax.jpg.jpeg',
     },
     {
       id: '17',
@@ -267,7 +262,7 @@ export const defaultContent: SiteContent = {
       name: 'Millar Gloria Adaobi',
       title: 'Assistant Secretary',
       bio: 'My name is Mrs Millar Gloria Adaobi, from Emulemoke Agbada Nenwe in Aninri Local Government Area of Enugu State. Presently I live in the UK and I am a full member of the NPA.',
-      imageUrl: '/img18.jpg',
+      imageUrl: '/member/20260104_145512%20-%20ODIUKO%20NA%20MBA%20ADAOBI%20(1).jpg',
     },
   ],
 
