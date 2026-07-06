@@ -74,6 +74,8 @@ export const Admin = () => {
   const [memberUploadingIndex, setMemberUploadingIndex] = useState<number | null>(null);
   const [memberUploadError, setMemberUploadError] = useState<string | null>(null);
   const [expandedMembers, setExpandedMembers] = useState<Set<number>>(new Set([0]));
+  const [pastEventUploadingIndex, setPastEventUploadingIndex] = useState<number | null>(null);
+  const [pastEventUploadError, setPastEventUploadError] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     heroHeadline: content.heroHeadline,
@@ -92,7 +94,7 @@ export const Admin = () => {
     galleryItems: content.galleryItems.map((i) => ({ ...i })),
     members: content.members.map((m) => ({ ...m, imageUrl: m.imageUrl ?? '' })),
     events: content.events.map((e) => ({ ...e })),
-    pastEvents: content.pastEvents.map((e) => ({ ...e, imageUrl: e.imageUrl ?? '' })),
+    pastEvents: content.pastEvents.map((e) => ({ ...e, images: e.images ?? [] })),
     projects: content.projects.map((p) => ({ ...p })),
     newsItems: content.newsItems.map((n) => ({ ...n })),
   });
@@ -286,12 +288,50 @@ export const Admin = () => {
       ...prev,
       pastEvents: [
         ...prev.pastEvents,
-        { id: `past-event-${Date.now()}`, title: '', date: '', location: '', detail: '', imageUrl: '' },
+        { id: `past-event-${Date.now()}`, title: '', date: '', location: '', detail: '', images: [] },
       ],
     }));
 
   const removePastEvent = (index: number) =>
     setForm((prev) => ({ ...prev, pastEvents: prev.pastEvents.filter((_, i) => i !== index) }));
+
+  const handlePastEventImageUpload = async (eventIndex: number, file: File) => {
+    setPastEventUploadingIndex(eventIndex);
+    setPastEventUploadError(null);
+    try {
+      const ext = file.name.split('.').pop();
+      const filename = `event-${form.pastEvents[eventIndex].id}-${Date.now()}.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from('gallery')
+        .upload(filename, file, { upsert: true });
+      if (uploadErr) throw uploadErr;
+      const { data } = supabase.storage.from('gallery').getPublicUrl(filename);
+      setForm((prev) => ({
+        ...prev,
+        pastEvents: prev.pastEvents.map((ev, i) =>
+          i === eventIndex
+            ? { ...ev, images: [...(ev.images ?? []), data.publicUrl] }
+            : ev
+        ),
+      }));
+    } catch (err) {
+      setPastEventUploadError(
+        err instanceof Error ? err.message : 'Upload failed.',
+      );
+    } finally {
+      setPastEventUploadingIndex(null);
+    }
+  };
+
+  const removePastEventImage = (eventIndex: number, imageIndex: number) =>
+    setForm((prev) => ({
+      ...prev,
+      pastEvents: prev.pastEvents.map((ev, i) =>
+        i === eventIndex
+          ? { ...ev, images: (ev.images ?? []).filter((_, j) => j !== imageIndex) }
+          : ev
+      ),
+    }));
 
   const handleProjectChange =
     (index: number, key: keyof ProjectItem) =>
@@ -360,13 +400,13 @@ export const Admin = () => {
           imageUrl: imageUrl || undefined,
         })),
         events: form.events,
-        pastEvents: form.pastEvents.map(({ id, title, date, location, detail, imageUrl }) => ({
+        pastEvents: form.pastEvents.map(({ id, title, date, location, detail, images }) => ({
           id,
           title,
           date,
           location,
           detail,
-          imageUrl: imageUrl || undefined,
+          images: images?.length ? images : undefined,
         })),
         projects: form.projects,
         newsItems: form.newsItems,
@@ -396,7 +436,7 @@ export const Admin = () => {
       galleryItems: defaultContent.galleryItems.map((i) => ({ ...i })),
       members: defaultContent.members.map((m) => ({ ...m, imageUrl: m.imageUrl ?? '' })),
       events: defaultContent.events.map((e) => ({ ...e })),
-      pastEvents: defaultContent.pastEvents.map((e) => ({ ...e, imageUrl: e.imageUrl ?? '' })),
+      pastEvents: defaultContent.pastEvents.map((e) => ({ ...e, images: e.images ?? [] })),
       projects: defaultContent.projects.map((p) => ({ ...p })),
       newsItems: defaultContent.newsItems.map((n) => ({ ...n })),
     });
@@ -668,6 +708,15 @@ export const Admin = () => {
               </button>
             </div>
 
+            {pastEventUploadError && (
+              <div
+                className="rounded-xl px-4 py-3 text-sm text-ember"
+                style={{ background: 'rgb(var(--color-ember)/0.1)', border: '1px solid rgb(var(--color-ember)/0.25)' }}
+              >
+                {pastEventUploadError}
+              </div>
+            )}
+
             {form.pastEvents.length === 0 && (
               <div
                 className="flex flex-col items-center justify-center rounded-2xl py-16 text-center"
@@ -721,6 +770,60 @@ export const Admin = () => {
                   <Field label="Description">
                     <textarea value={event.detail} onChange={handlePastEventChange(index, 'detail')} rows={2} className={inputCls} style={inputStyle} placeholder="Brief description of the event" />
                   </Field>
+
+                  {/* Photos */}
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-charcoal/50">
+                      Event Photos
+                    </label>
+                    {(event.images ?? []).length > 0 && (
+                      <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                        {(event.images ?? []).map((url, imgIdx) => (
+                          <div key={imgIdx} className="relative group">
+                            <img
+                              src={url}
+                              alt=""
+                              className="h-20 w-full rounded-lg object-cover"
+                              style={{ border: '1px solid rgb(var(--card-border))' }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removePastEventImage(index, imgIdx)}
+                              className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-ember text-sand opacity-0 transition group-hover:opacity-100"
+                            >
+                              <TrashIcon className="h-2.5 w-2.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <label
+                      className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.15em] transition ${
+                        pastEventUploadingIndex === index
+                          ? 'cursor-not-allowed text-charcoal/30'
+                          : 'text-forest hover:bg-forest/10'
+                      }`}
+                      style={{
+                        borderColor: pastEventUploadingIndex === index
+                          ? 'rgb(var(--card-border))'
+                          : 'rgb(var(--color-forest)/0.35)',
+                      }}
+                    >
+                      <CameraIcon className="h-3 w-3" />
+                      {pastEventUploadingIndex === index ? 'Uploading…' : 'Add Photo'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="sr-only"
+                        disabled={pastEventUploadingIndex !== null}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handlePastEventImageUpload(index, file);
+                          e.target.value = '';
+                        }}
+                      />
+                    </label>
+                  </div>
                 </div>
               ))}
             </div>

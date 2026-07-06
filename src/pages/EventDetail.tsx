@@ -60,12 +60,17 @@ export const EventDetail = () => {
       {/* Photos */}
       <div className="space-y-4">
         <h2 className="text-lg font-bold text-ink">Event Photos</h2>
-        {event.imageUrl ? (
-          <img
-            src={event.imageUrl}
-            alt={event.title}
-            className="w-full rounded-2xl object-cover"
-          />
+        {event.images && event.images.length > 0 ? (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {event.images.map((url, i) => (
+              <img
+                key={i}
+                src={url}
+                alt={`${event.title} — photo ${i + 1}`}
+                className="w-full rounded-2xl object-cover aspect-[4/3]"
+              />
+            ))}
+          </div>
         ) : (
           <div
             className="flex h-48 items-center justify-center rounded-2xl"

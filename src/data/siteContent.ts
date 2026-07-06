@@ -35,7 +35,7 @@ export type PastEvent = {
   date: string;
   location: string;
   detail: string;
-  imageUrl?: string;
+  images?: string[];
 };
 
 export type ProjectItem = {
