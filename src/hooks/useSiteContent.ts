@@ -23,12 +23,8 @@ const readContent = (): SiteContent => {
       merged.galleryItems = defaultContent.galleryItems.map((def, i) => {
         const saved = stored.galleryItems![i];
         if (!saved) return def;
-        return { ...def, ...saved, imageUrl: saved.imageUrl || def.imageUrl };
+        return { title: def.title, imageUrl: saved.imageUrl || def.imageUrl };
       });
-      // Keep any extra items the admin added beyond the defaults
-      if (stored.galleryItems.length > defaultContent.galleryItems.length) {
-        merged.galleryItems.push(...stored.galleryItems.slice(defaultContent.galleryItems.length));
-      }
     }
 
     // Merge members by ID — bios and titles always come from defaultContent
