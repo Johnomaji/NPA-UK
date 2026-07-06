@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useSiteContentContext } from '../components/SiteContentProvider';
 import { getTranslations } from '../data/translations';
 import { PageHeader } from '../components/PageHeader';
@@ -87,7 +88,8 @@ export const Events = () => {
                       )}
                     </div>
                   </div>
-                  <button
+                  <a
+                    href="/contact"
                     className="flex-none rounded-full px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] transition hover:brightness-110"
                     style={
                       isHighlighted
@@ -99,7 +101,7 @@ export const Events = () => {
                     }
                   >
                     {t.events.rsvp}
-                  </button>
+                  </a>
                 </div>
                 <p className="text-sm leading-relaxed text-charcoal/60">{event.detail}</p>
                 {event.location && (
@@ -110,6 +112,40 @@ export const Events = () => {
           );
         })}
       </div>
+
+      {/* Past Events */}
+      {content.pastEvents.length > 0 && (
+        <div className="space-y-6">
+          <div className="space-y-1">
+            <p className="section-kicker">Past Events</p>
+            <h2 className="section-title">Previous Gatherings</h2>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {content.pastEvents.map((event) => (
+              <div
+                key={event.id}
+                className="flex flex-col justify-between gap-4 rounded-2xl p-6 space-y-2"
+                style={{ background: 'rgb(var(--card-bg))', border: '1px solid rgb(var(--card-border))' }}
+              >
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-forest">
+                    {event.date} {event.location && `· ${event.location}`}
+                  </p>
+                  <p className="font-bold text-ink leading-snug">{event.title}</p>
+                  <p className="text-sm text-charcoal/60 leading-relaxed">{event.detail}</p>
+                </div>
+                <Link
+                  to={`/events/${event.id}`}
+                  className="self-start rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-[0.15em] text-forest transition hover:bg-forest/10"
+                  style={{ borderColor: 'rgb(var(--color-forest)/0.4)' }}
+                >
+                  View Event
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Bottom CTA */}
       <div

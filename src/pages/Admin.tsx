@@ -19,7 +19,7 @@ import {
   UsersIcon,
   CalendarIcon,
 } from '../components/Icons';
-import type { EventItem, ProjectItem, NewsItem } from '../data/siteContent';
+import type { EventItem, PastEvent, ProjectItem, NewsItem } from '../data/siteContent';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -56,7 +56,7 @@ const Card = ({ title, children }: CardProps) => (
   </div>
 );
 
-type TabId = 'general' | 'events' | 'projects' | 'news' | 'blog' | 'gallery' | 'members';
+type TabId = 'general' | 'events' | 'past-events' | 'projects' | 'news' | 'blog' | 'gallery' | 'members';
 
 const PROJECT_STATUSES = ['Active', 'Ongoing', 'Funding', 'Planning'] as const;
 
@@ -92,6 +92,7 @@ export const Admin = () => {
     galleryItems: content.galleryItems.map((i) => ({ ...i })),
     members: content.members.map((m) => ({ ...m, imageUrl: m.imageUrl ?? '' })),
     events: content.events.map((e) => ({ ...e })),
+    pastEvents: content.pastEvents.map((e) => ({ ...e, imageUrl: e.imageUrl ?? '' })),
     projects: content.projects.map((p) => ({ ...p })),
     newsItems: content.newsItems.map((n) => ({ ...n })),
   });
@@ -272,6 +273,26 @@ export const Admin = () => {
   const removeEvent = (index: number) =>
     setForm((prev) => ({ ...prev, events: prev.events.filter((_, i) => i !== index) }));
 
+  const handlePastEventChange =
+    (index: number, key: keyof PastEvent) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setForm((prev) => ({
+        ...prev,
+        pastEvents: prev.pastEvents.map((ev, i) => (i === index ? { ...ev, [key]: e.target.value } : ev)),
+      }));
+
+  const addPastEvent = () =>
+    setForm((prev) => ({
+      ...prev,
+      pastEvents: [
+        ...prev.pastEvents,
+        { id: `past-event-${Date.now()}`, title: '', date: '', location: '', detail: '', imageUrl: '' },
+      ],
+    }));
+
+  const removePastEvent = (index: number) =>
+    setForm((prev) => ({ ...prev, pastEvents: prev.pastEvents.filter((_, i) => i !== index) }));
+
   const handleProjectChange =
     (index: number, key: keyof ProjectItem) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -307,9 +328,9 @@ export const Admin = () => {
     setForm((prev) => ({ ...prev, newsItems: prev.newsItems.filter((_, i) => i !== index) }));
 
   const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
+    async (e: React.FormEvent) => {
       e.preventDefault();
-      updateContent({
+      await updateContent({
         heroHeadline: form.heroHeadline,
         heroSubheadline: form.heroSubheadline,
         mission: form.mission,
@@ -339,6 +360,14 @@ export const Admin = () => {
           imageUrl: imageUrl || undefined,
         })),
         events: form.events,
+        pastEvents: form.pastEvents.map(({ id, title, date, location, detail, imageUrl }) => ({
+          id,
+          title,
+          date,
+          location,
+          detail,
+          imageUrl: imageUrl || undefined,
+        })),
         projects: form.projects,
         newsItems: form.newsItems,
       });
@@ -347,9 +376,9 @@ export const Admin = () => {
     [form, updateContent],
   );
 
-  const handleReset = () => {
+  const handleReset = async () => {
     if (!confirm('Reset all content to defaults? This cannot be undone.')) return;
-    resetContent();
+    await resetContent();
     setForm({
       heroHeadline: defaultContent.heroHeadline,
       heroSubheadline: defaultContent.heroSubheadline,
@@ -367,6 +396,7 @@ export const Admin = () => {
       galleryItems: defaultContent.galleryItems.map((i) => ({ ...i })),
       members: defaultContent.members.map((m) => ({ ...m, imageUrl: m.imageUrl ?? '' })),
       events: defaultContent.events.map((e) => ({ ...e })),
+      pastEvents: defaultContent.pastEvents.map((e) => ({ ...e, imageUrl: e.imageUrl ?? '' })),
       projects: defaultContent.projects.map((p) => ({ ...p })),
       newsItems: defaultContent.newsItems.map((n) => ({ ...n })),
     });
@@ -376,6 +406,7 @@ export const Admin = () => {
   const tabs: { id: TabId; label: string; icon: React.ReactNode; count?: number }[] = [
     { id: 'general', label: 'General', icon: <SettingsIcon className="h-3.5 w-3.5" /> },
     { id: 'events', label: 'Events', icon: <CalendarIcon className="h-3.5 w-3.5" />, count: form.events.length },
+    { id: 'past-events', label: 'Past Events', icon: <CalendarIcon className="h-3.5 w-3.5" />, count: form.pastEvents.length },
     { id: 'projects', label: 'Projects', icon: <ImageIcon className="h-3.5 w-3.5" />, count: form.projects.length },
     { id: 'news', label: 'News', icon: <ImageIcon className="h-3.5 w-3.5" />, count: form.newsItems.length },
     { id: 'blog', label: 'Blog', icon: <ImageIcon className="h-3.5 w-3.5" />, count: form.blogPosts.length },
@@ -612,6 +643,83 @@ export const Admin = () => {
                   </div>
                   <Field label="Description">
                     <textarea value={event.detail} onChange={handleEventChange(index, 'detail')} rows={2} className={inputCls} style={inputStyle} placeholder="Brief description of the event" />
+                  </Field>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ════ PAST EVENTS TAB ════ */}
+        {activeTab === 'past-events' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-forest">Past Events</p>
+                <p className="mt-0.5 text-xs text-charcoal/50">{form.pastEvents.length} past events · each has its own page at /events/:id</p>
+              </div>
+              <button
+                type="button"
+                onClick={addPastEvent}
+                className="flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-sand transition hover:brightness-110"
+                style={{ background: 'rgb(var(--color-forest))' }}
+              >
+                <PlusIcon className="h-3 w-3" /> Add Past Event
+              </button>
+            </div>
+
+            {form.pastEvents.length === 0 && (
+              <div
+                className="flex flex-col items-center justify-center rounded-2xl py-16 text-center"
+                style={{ border: '1px dashed rgb(var(--card-border))' }}
+              >
+                <CalendarIcon className="mb-3 h-8 w-8 text-charcoal/20" />
+                <p className="text-sm text-charcoal/40">No past events yet.</p>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              {form.pastEvents.map((event, index) => (
+                <div
+                  key={index}
+                  className="rounded-2xl space-y-4 p-5"
+                  style={{ border: '1px solid rgb(var(--card-border))', background: 'rgb(var(--card-bg))' }}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span
+                      className="flex h-6 w-6 flex-none items-center justify-center rounded-full text-[10px] font-bold"
+                      style={{ background: 'rgb(var(--card-border))', color: 'rgb(var(--color-charcoal)/0.5)' }}
+                    >
+                      {index + 1}
+                    </span>
+                    <span className="flex-1 truncate text-sm font-semibold text-ink">
+                      {event.title || <span className="italic text-charcoal/30">Untitled event</span>}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removePastEvent(index)}
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-charcoal/30 transition hover:text-ember"
+                      style={{ border: '1px solid rgb(var(--card-border))' }}
+                    >
+                      <TrashIcon className="h-3 w-3" />
+                    </button>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label="Event Title">
+                      <input value={event.title} onChange={handlePastEventChange(index, 'title')} className={inputCls} style={inputStyle} placeholder="e.g. NPA UK Get-Together in Manchester" />
+                    </Field>
+                    <Field label="Date" hint="e.g. November 2025">
+                      <input value={event.date} onChange={handlePastEventChange(index, 'date')} className={inputCls} style={inputStyle} placeholder="November 2025" />
+                    </Field>
+                    <Field label="Location">
+                      <input value={event.location} onChange={handlePastEventChange(index, 'location')} className={inputCls} style={inputStyle} placeholder="e.g. Manchester, UK" />
+                    </Field>
+                    <Field label="URL Slug (do not change)" hint="Used in the event page URL">
+                      <input value={event.id} onChange={handlePastEventChange(index, 'id')} className={inputCls} style={inputStyle} placeholder="e.g. manchester-nov-2025" />
+                    </Field>
+                  </div>
+                  <Field label="Description">
+                    <textarea value={event.detail} onChange={handlePastEventChange(index, 'detail')} rows={2} className={inputCls} style={inputStyle} placeholder="Brief description of the event" />
                   </Field>
                 </div>
               ))}

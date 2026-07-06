@@ -1,79 +1,81 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { defaultContent, type SiteContent } from '../data/siteContent';
+import { supabase } from '../lib/supabase';
 
-const STORAGE_KEY = 'npa-uk-content';
+const CONTENT_ROW_ID = 1;
 
-const readContent = (): SiteContent => {
-  if (typeof window === 'undefined') {
-    return defaultContent;
-  }
+const mergeWithDefaults = (stored: Partial<SiteContent>): SiteContent => {
+  const merged: SiteContent = { ...defaultContent, ...stored };
 
-  const raw = window.localStorage.getItem(STORAGE_KEY);
-  if (!raw) {
-    return defaultContent;
-  }
-
-  try {
-    const stored = JSON.parse(raw) as Partial<SiteContent>;
-    const merged: SiteContent = { ...defaultContent, ...stored };
-
-    // Merge gallery items by index so public-folder images always show,
-    // but any image the admin uploaded via Supabase is kept.
-    if (stored.galleryItems) {
-      merged.galleryItems = defaultContent.galleryItems.map((def, i) => {
-        const saved = stored.galleryItems![i];
-        if (!saved) return def;
-        return { title: def.title, imageUrl: saved.imageUrl || def.imageUrl };
-      });
+  // Gallery: preserve Supabase-uploaded images, fall back to public folder
+  if (stored.galleryItems) {
+    merged.galleryItems = defaultContent.galleryItems.map((def, i) => {
+      const saved = stored.galleryItems![i];
+      if (!saved) return def;
+      return { title: def.title, imageUrl: saved.imageUrl || def.imageUrl };
+    });
+    if (stored.galleryItems.length > defaultContent.galleryItems.length) {
+      merged.galleryItems.push(...stored.galleryItems.slice(defaultContent.galleryItems.length));
     }
-
-    // Merge members by ID — bios and titles always come from defaultContent
-    // so stale localStorage data can never override real bios in the code.
-    // Only the admin-uploaded imageUrl is taken from stored data.
-    if (stored.members) {
-      const savedById = new Map(
-        stored.members.filter(m => m.id).map(m => [m.id, m])
-      );
-      const defaultIds = new Set(defaultContent.members.map(m => m.id));
-
-      merged.members = defaultContent.members.map((def) => {
-        const saved = savedById.get(def.id);
-        if (!saved) return def;
-        // If defaultContent already has a real local path, always use it so
-        // stale Supabase URLs in localStorage can't override local photos.
-        const imageUrl = def.imageUrl?.startsWith('/member/')
-          ? def.imageUrl
-          : (saved.imageUrl || def.imageUrl);
-        return { ...def, imageUrl };
-      });
-      // Keep admin-added members (IDs not in defaults)
-      const extra = stored.members.filter(m => m.id && !defaultIds.has(m.id));
-      merged.members.push(...extra);
-    }
-
-    return merged;
-  } catch {
-    return defaultContent;
   }
+
+  // Members: merge by ID so ordering changes never corrupt data.
+  // Bios and titles always come from defaultContent; only imageUrl from DB.
+  if (stored.members) {
+    const savedById = new Map(
+      stored.members.filter(m => m.id).map(m => [m.id, m])
+    );
+    merged.members = defaultContent.members.map((def) => {
+      const saved = savedById.get(def.id);
+      if (!saved) return def;
+      const imageUrl = def.imageUrl?.startsWith('/')
+        ? def.imageUrl
+        : (saved.imageUrl || def.imageUrl);
+      return { ...def, imageUrl };
+    });
+    const defaultIds = new Set(defaultContent.members.map(m => m.id));
+    const extra = stored.members.filter(m => m.id && !defaultIds.has(m.id));
+    merged.members.push(...extra);
+  }
+
+  return merged;
 };
 
 export const useSiteContent = () => {
-  const [content, setContent] = useState<SiteContent>(() => readContent());
+  const [content, setContent] = useState<SiteContent>(defaultContent);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
+    supabase
+      .from('site_content')
+      .select('content')
+      .eq('id', CONTENT_ROW_ID)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.content) {
+          setContent(mergeWithDefaults(data.content as Partial<SiteContent>));
+        }
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const updateContent = useCallback(async (updates: Partial<SiteContent>) => {
+    const next = { ...content, ...updates };
+    setContent(next);
+    await supabase
+      .from('site_content')
+      .upsert({ id: CONTENT_ROW_ID, content: next, updated_at: new Date().toISOString() });
   }, [content]);
 
-  const updateContent = (updates: Partial<SiteContent>) => {
-    setContent((prev) => ({ ...prev, ...updates }));
-  };
-
-  const resetContent = () => {
+  const resetContent = useCallback(async () => {
     setContent(defaultContent);
-  };
+    await supabase
+      .from('site_content')
+      .upsert({ id: CONTENT_ROW_ID, content: defaultContent, updated_at: new Date().toISOString() });
+  }, []);
 
   return useMemo(
-    () => ({ content, updateContent, resetContent }),
-    [content],
+    () => ({ content, loading, updateContent, resetContent }),
+    [content, loading, updateContent, resetContent],
   );
 };

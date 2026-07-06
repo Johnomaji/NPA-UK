@@ -29,6 +29,15 @@ export type EventItem = {
   detail: string;
 };
 
+export type PastEvent = {
+  id: string;
+  title: string;
+  date: string;
+  location: string;
+  detail: string;
+  imageUrl?: string;
+};
+
 export type ProjectItem = {
   title: string;
   status: 'Active' | 'Ongoing' | 'Funding' | 'Planning';
@@ -59,6 +68,7 @@ export type SiteContent = {
   galleryItems: GalleryItem[];
   members: CommunityMember[];
   events: EventItem[];
+  pastEvents: PastEvent[];
   projects: ProjectItem[];
   newsItems: NewsItem[];
 };
@@ -157,7 +167,7 @@ export const defaultContent: SiteContent = {
       name: 'Mr/Mrs Daniel & Ijeoma Dike',
       title: 'Vice Chairman',
       bio: 'Pioneer member of the Nenwe Progressive Association UK.',
-      imageUrl: '/img17.jpg',
+      imageUrl: '/member/Daniel%20Dike.jpg',
     },
     {
       id: '2',
@@ -264,6 +274,13 @@ export const defaultContent: SiteContent = {
       bio: 'From Amoji Nenwe.',
       imageUrl: '/member/20230723_134852%20-%20Celetrancy%20Johnsonwax.jpg.jpeg',
     },
+    {
+      id: '19',
+      name: 'Dr Mathew O. Onu',
+      title: 'Member',
+      bio: 'Dr. Mathew Onu is a native of Amoji-Nenwe in Aninri LGA of Enugu State, Nigeria. Married to Mrs Ijeoma Onu and blessed with four children. Lives in Colchester, Essex, United Kingdom.',
+      imageUrl: '/member/dronu.jpeg',
+    },
   ],
 
   events: [
@@ -284,6 +301,72 @@ export const defaultContent: SiteContent = {
       date: 'August 20, 2026',
       location: 'Nenwe',
       detail: 'Leadership, mentorship, and career development workshops.',
+    },
+  ],
+
+  pastEvents: [
+    {
+      id: 'manchester-nov-2025',
+      title: 'NPA UK Get-Together Party — November 2025',
+      date: 'November 2025',
+      location: 'Manchester, UK',
+      detail: 'The NPA UK community came together in Manchester for a warm and memorable get-together, strengthening bonds and celebrating our shared heritage.',
+    },
+    {
+      id: 'colchester-onu',
+      title: 'Get-Together in Colchester hosted by Dr & Mrs Matthew Ọnụ',
+      date: '2025',
+      location: 'Colchester, Essex, UK',
+      detail: 'A wonderful family get-together and meeting hosted graciously by Dr & Mrs Matthew Ọnụ in Colchester.',
+    },
+    {
+      id: 'aylesbury-udenta',
+      title: 'Family Get-Together hosted by Dr & Mrs Celestine Udenta',
+      date: '2025',
+      location: 'Aylesbury, UK',
+      detail: 'Dr & Mrs Celestine Udenta opened their home in Aylesbury for a warm meeting and family get-together.',
+    },
+    {
+      id: 'stirling-holiday',
+      title: 'NPA UK Family Holiday in Stirling, Scotland',
+      date: '2025',
+      location: 'Stirling, Scotland',
+      detail: 'Members and families enjoyed a memorable holiday together in the beautiful city of Stirling, Scotland.',
+    },
+    {
+      id: 'casmir-gettogether',
+      title: 'Meeting / Get-Together hosted by Mr. Casmir',
+      date: '2025',
+      location: 'United Kingdom',
+      detail: 'Mr. Casmir hosted a lovely NPA-UK meeting and family get-together for members across the UK.',
+    },
+    {
+      id: 'dan-dike-gettogether',
+      title: 'Meeting / Get-Together hosted by Chief Dan Dike',
+      date: '2025',
+      location: 'United Kingdom',
+      detail: 'Chief Dan Dike hosted members for a warm NPA-UK meeting and family get-together.',
+    },
+    {
+      id: 'essex-nweke',
+      title: 'Meeting / Get-Together hosted by Hon Chidi Nweke',
+      date: '2025',
+      location: 'Essex, UK',
+      detail: 'Hon Chidi Nweke welcomed members to Essex for an NPA-UK meeting and family get-together.',
+    },
+    {
+      id: 'manchester-pascal',
+      title: 'Meeting / Get-Together hosted by Pascal Okereke',
+      date: '2025',
+      location: 'Manchester, UK',
+      detail: 'Pascal Okereke hosted a fantastic NPA-UK meeting and family get-together in Manchester.',
+    },
+    {
+      id: 'christian-ndubuisi',
+      title: 'Meeting / Get-Together hosted by Dr Christian Ndubuisi',
+      date: '2025',
+      location: 'United Kingdom',
+      detail: 'Dr Christian Ndubuisi hosted members for an NPA-UK meeting and family get-together.',
     },
   ],
 
