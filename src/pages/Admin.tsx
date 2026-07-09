@@ -129,27 +129,33 @@ export const Admin = () => {
         ),
       }));
 
+  const uploadToImgBB = async (file: File): Promise<string> => {
+    const key = import.meta.env.VITE_IMGBB_KEY;
+    if (!key || key === 'your_imgbb_api_key_here') {
+      throw new Error('ImgBB API key not set. Add VITE_IMGBB_KEY to your .env file.');
+    }
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('key', key);
+    const res = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: formData });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error?.message ?? 'Image upload failed.');
+    return json.data.url as string;
+  };
+
   const handleGalleryImageUpload = async (index: number, file: File) => {
     setUploadingIndex(index);
     setUploadError(null);
     try {
-      const ext = file.name.split('.').pop();
-      const filename = `gallery-${Date.now()}-${index}.${ext}`;
-      const { error: uploadErr } = await supabase.storage
-        .from('gallery')
-        .upload(filename, file, { upsert: true });
-      if (uploadErr) throw uploadErr;
-      const { data } = supabase.storage.from('gallery').getPublicUrl(filename);
+      const url = await uploadToImgBB(file);
       setForm((prev) => ({
         ...prev,
         galleryItems: prev.galleryItems.map((item, i) =>
-          i === index ? { ...item, imageUrl: data.publicUrl } : item,
+          i === index ? { ...item, imageUrl: url } : item,
         ),
       }));
     } catch (err) {
-      setUploadError(
-        err instanceof Error ? err.message : 'Upload failed. Check your Supabase storage bucket.',
-      );
+      setUploadError(err instanceof Error ? err.message : 'Upload failed.');
     } finally {
       setUploadingIndex(null);
     }
@@ -204,23 +210,15 @@ export const Admin = () => {
     setMemberUploadingIndex(index);
     setMemberUploadError(null);
     try {
-      const ext = file.name.split('.').pop();
-      const filename = `member-${Date.now()}-${index}.${ext}`;
-      const { error: uploadErr } = await supabase.storage
-        .from('members')
-        .upload(filename, file, { upsert: true });
-      if (uploadErr) throw uploadErr;
-      const { data } = supabase.storage.from('members').getPublicUrl(filename);
+      const url = await uploadToImgBB(file);
       setForm((prev) => ({
         ...prev,
         members: prev.members.map((m, i) =>
-          i === index ? { ...m, imageUrl: data.publicUrl } : m,
+          i === index ? { ...m, imageUrl: url } : m,
         ),
       }));
     } catch (err) {
-      setMemberUploadError(
-        err instanceof Error ? err.message : 'Upload failed. Check your Supabase storage bucket.',
-      );
+      setMemberUploadError(err instanceof Error ? err.message : 'Upload failed.');
     } finally {
       setMemberUploadingIndex(null);
     }
@@ -299,25 +297,17 @@ export const Admin = () => {
     setPastEventUploadingIndex(eventIndex);
     setPastEventUploadError(null);
     try {
-      const ext = file.name.split('.').pop();
-      const filename = `event-${form.pastEvents[eventIndex].id}-${Date.now()}.${ext}`;
-      const { error: uploadErr } = await supabase.storage
-        .from('gallery')
-        .upload(filename, file, { upsert: true });
-      if (uploadErr) throw uploadErr;
-      const { data } = supabase.storage.from('gallery').getPublicUrl(filename);
+      const url = await uploadToImgBB(file);
       setForm((prev) => ({
         ...prev,
         pastEvents: prev.pastEvents.map((ev, i) =>
           i === eventIndex
-            ? { ...ev, images: [...(ev.images ?? []), data.publicUrl] }
+            ? { ...ev, images: [...(ev.images ?? []), url] }
             : ev
         ),
       }));
     } catch (err) {
-      setPastEventUploadError(
-        err instanceof Error ? err.message : 'Upload failed.',
-      );
+      setPastEventUploadError(err instanceof Error ? err.message : 'Upload failed.');
     } finally {
       setPastEventUploadingIndex(null);
     }

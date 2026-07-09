@@ -311,6 +311,14 @@ export const defaultContent: SiteContent = {
       date: 'November 2025',
       location: 'Manchester, UK',
       detail: 'The NPA UK community came together in Manchester for a warm and memorable get-together, strengthening bonds and celebrating our shared heritage.',
+      images: [
+        `${UNS}1527529482837-4698179dc6ce${Q}`,
+        `${UNS}1519671482749-fd09be7ccebf${Q}`,
+        `${UNS}1543269865-cbf427effbad${Q}`,
+        `${UNS}1531058020387-3be344556be6${Q}`,
+        `${UNS}1546519638-68e109498ffc${Q}`,
+        `${UNS}1574391884720-bbc3740c59d1${Q}`,
+      ],
     },
     {
       id: 'colchester-onu',
