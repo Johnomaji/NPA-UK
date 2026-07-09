@@ -46,17 +46,21 @@ export const useSiteContent = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase
-      .from('site_content')
-      .select('content')
-      .eq('id', CONTENT_ROW_ID)
-      .maybeSingle()
-      .then(({ data }) => {
+    const load = async () => {
+      try {
+        const { data } = await supabase
+          .from('site_content')
+          .select('content')
+          .eq('id', CONTENT_ROW_ID)
+          .maybeSingle();
         if (data?.content) {
           setContent(mergeWithDefaults(data.content as Partial<SiteContent>));
         }
-      })
-      .finally(() => setLoading(false));
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, []);
 
   const updateContent = useCallback(async (updates: Partial<SiteContent>) => {

@@ -5,7 +5,6 @@ import { useAuth } from '../auth/AuthProvider';
 import { defaultContent } from '../data/siteContent';
 import { themeOptions } from '../data/themes';
 import { languageOptions } from '../data/translations';
-import { supabase } from '../lib/supabase';
 import {
   CameraIcon,
   CheckCircleIcon,
