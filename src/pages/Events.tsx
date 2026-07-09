@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSiteContentContext } from '../components/SiteContentProvider';
 import { getTranslations } from '../data/translations';
 import { PageHeader } from '../components/PageHeader';
+import { GridIcon, ListIcon } from '../components/Icons';
 
 const parseDate = (dateStr: string) => {
   const parts = dateStr.split(' ');
@@ -16,6 +18,7 @@ const parseDate = (dateStr: string) => {
 export const Events = () => {
   const { content } = useSiteContentContext();
   const t = getTranslations(content.language);
+  const [pastEventsView, setPastEventsView] = useState<'grid' | 'list'>('list');
 
   return (
     <div className="space-y-14">
@@ -116,34 +119,114 @@ export const Events = () => {
       {/* Past Events */}
       {content.pastEvents.length > 0 && (
         <div className="space-y-6">
-          <div className="space-y-1">
-            <p className="section-kicker">Past Events</p>
-            <h2 className="section-title">Previous Gatherings</h2>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {content.pastEvents.map((event) => (
-              <div
-                key={event.id}
-                className="flex flex-col justify-between gap-4 rounded-2xl p-6 space-y-2"
-                style={{ background: 'rgb(var(--card-bg))', border: '1px solid rgb(var(--card-border))' }}
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="space-y-1">
+              <p className="section-kicker">Past Events</p>
+              <h2 className="section-title">Previous Gatherings</h2>
+            </div>
+            {/* View toggle */}
+            <div
+              className="flex rounded-xl p-1"
+              style={{ background: 'rgb(var(--card-bg))', border: '1px solid rgb(var(--card-border))' }}
+            >
+              <button
+                type="button"
+                onClick={() => setPastEventsView('grid')}
+                className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition"
+                style={
+                  pastEventsView === 'grid'
+                    ? { background: 'rgb(var(--color-forest)/0.12)', color: 'rgb(var(--color-forest))' }
+                    : { color: 'rgb(var(--color-charcoal)/0.4)' }
+                }
+                title="Grid view"
               >
-                <div className="space-y-1">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-forest">
-                    {event.date} {event.location && `· ${event.location}`}
-                  </p>
-                  <p className="font-bold text-ink leading-snug">{event.title}</p>
-                  <p className="text-sm text-charcoal/60 leading-relaxed">{event.detail}</p>
-                </div>
-                <Link
-                  to={`/events/${event.id}`}
-                  className="self-start rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-[0.15em] text-forest transition hover:bg-forest/10"
-                  style={{ borderColor: 'rgb(var(--color-forest)/0.4)' }}
-                >
-                  View Event
-                </Link>
-              </div>
-            ))}
+                <GridIcon className="h-3.5 w-3.5" /> Grid
+              </button>
+              <button
+                type="button"
+                onClick={() => setPastEventsView('list')}
+                className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition"
+                style={
+                  pastEventsView === 'list'
+                    ? { background: 'rgb(var(--color-forest)/0.12)', color: 'rgb(var(--color-forest))' }
+                    : { color: 'rgb(var(--color-charcoal)/0.4)' }
+                }
+                title="List view"
+              >
+                <ListIcon className="h-3.5 w-3.5" /> List
+              </button>
+            </div>
           </div>
+
+          {/* Grid view */}
+          {pastEventsView === 'grid' && (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {content.pastEvents.map((event) => (
+                <div
+                  key={event.id}
+                  className="flex flex-col justify-between gap-4 rounded-2xl p-6 space-y-2"
+                  style={{ background: 'rgb(var(--card-bg))', border: '1px solid rgb(var(--card-border))' }}
+                >
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-forest">
+                      {event.date} {event.location && `· ${event.location}`}
+                    </p>
+                    <p className="font-bold text-ink leading-snug">{event.title}</p>
+                    <p className="text-sm text-charcoal/60 leading-relaxed">{event.detail}</p>
+                  </div>
+                  <Link
+                    to={`/events/${event.id}`}
+                    className="self-start rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-[0.15em] text-forest transition hover:bg-forest/10"
+                    style={{ borderColor: 'rgb(var(--color-forest)/0.4)' }}
+                  >
+                    View Event
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* List view */}
+          {pastEventsView === 'list' && (
+            <div className="space-y-3">
+              {content.pastEvents.map((event) => (
+                <div
+                  key={event.id}
+                  className="flex flex-wrap items-center justify-between gap-4 rounded-2xl px-6 py-4"
+                  style={{ background: 'rgb(var(--card-bg))', border: '1px solid rgb(var(--card-border))' }}
+                >
+                  <div className="flex items-center gap-5">
+                    <div className="hidden flex-none text-center sm:block" style={{ minWidth: '3rem' }}>
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-forest">
+                        {(event.date.split(' ')[0] ?? '').slice(0, 3)}
+                      </p>
+                      <p className="font-display text-xl font-bold leading-none text-ink">
+                        {(event.date.split(' ')[1] ?? '').replace(',', '')}
+                      </p>
+                      <p className="text-[9px] text-charcoal/40">{event.date.split(' ')[2] ?? ''}</p>
+                    </div>
+                    <div className="space-y-0.5">
+                      <p className="font-bold text-ink leading-snug">{event.title}</p>
+                      <p className="text-xs text-charcoal/40">
+                        {event.date}
+                        {event.location && ` · ${event.location}`}
+                      </p>
+                      {event.detail && (
+                        <p className="text-sm text-charcoal/60 leading-relaxed line-clamp-1">{event.detail}</p>
+                      )}
+                    </div>
+                  </div>
+                  <Link
+                    to={`/events/${event.id}`}
+                    className="flex-none rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-[0.15em] text-forest transition hover:bg-forest/10"
+                    style={{ borderColor: 'rgb(var(--color-forest)/0.4)' }}
+                  >
+                    View Event
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

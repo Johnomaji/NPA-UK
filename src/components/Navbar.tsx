@@ -82,7 +82,7 @@ export const Navbar = () => {
 
           <Link
             to="/donate"
-            className="rounded-full px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] text-sand transition hover:brightness-110"
+            className="hidden rounded-full px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] text-sand transition hover:brightness-110 lg:inline-flex"
             style={{ background: 'rgb(var(--color-forest))' }}
           >
             {t.nav.donate}
